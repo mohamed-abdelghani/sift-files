@@ -2,3 +2,4 @@
 
 cp foremost/foremost.conf /etc/foremost.conf
 cp sorter/* /usr/share/tsk/sorter
+cp samba/* /etc/samba
