@@ -1,0 +1,441 @@
+<html>
+
+<head>
+    <title>pf readme</title>
+    <style type="text/css">
+        div
+        {
+            margin-left: 1em;
+        }
+    </style>
+</head>
+
+<body bgcolor="white"">
+
+<h2 align="center"><a name="index">Windows Prefetch Parser - <i>pf</i></a></h2>
+<h3 align="center">(version 1.03)<br /><br /></h3>
+<!--WARNING_TAG-->
+<hr />
+
+<ul>
+    <li> <a href="#eula"> End User's License Agreement (EULA) </a></li>
+
+    <li> <a href="#about"> About the <b><i>pf</i></b> Tool </a></li>
+    <li> <a href="#howto">How to use this tool</a></li>
+    <li> <a href="#options">List of options</a></li>
+    <li> <a href="#auth"> Authentication and License File </a></li>
+    <li> <a href="#version_history"> Version history </a></li>
+    <li> <a href="#references"> References </a></li>
+</ul>
+
+
+
+<hr/><!---------------------EULA---------------------->
+<h2><a name="eula">TZWorks Tools included in the SANS Investigative Forensic Toolkit (SIFT)</br>
+END USER LICENSE AGREEMENT (EULA)</a></h2>
+
+<h3>USER AGREEMENT</h3>
+<div>
+<p>Permission to use the TZWorks, LLC software and related documentation (&quot;Software&quot;) 
+is for <b>Demonstration and Testing use ONLY</b>. The User Agreement, Disclaimer, and/or Software 
+may change from time to time.  By continuing to use the Software after those changes become 
+effective, you agree to be bound by all such changes.  Permission to use the Software is granted 
+provided that (1) use of such Software is for <b>Demonstration and Testing use only</b> and 
+(2) the Software is not resold, transferred or distributed to any other person or entity.  
+<i><font color="red">To use the Software for commercial or business purposes, a separate 
+license is required.</font></i> Contact TZWorks, LLC 
+(<a href="mailto:info@tzworks.net">info&#64;tzworks.net</a>) 
+for more information regarding licensing. To redistribute the Software, approval in writing 
+is required from TZWorks, LLC.  These terms do not give the user any rights in intellectual 
+property or technology, but only a limited right to use the Software for <b>Demostrations and 
+Testing</b>.  TZWorks, LLC retains all rights to ownership of this Software.</p>
+</div>
+
+<h3>DISCLAIMER</h3>    
+<div>
+<p>The user agrees that this Software is experimental in nature and use of the Software is 
+at user's sole risk.  The Software could include technical inaccuracies or errors.  Changes 
+are periodically added to the information herein, and TZWorks, LLC may make improvements and/or 
+changes to Software at any time.  TZWorks, LLC makes no representations about the accuracy or 
+usability of the Software for any purpose.</p>
+
+<p>ALL SOFTWARE ARE PROVIDED &quot;AS IS&quot; AND &quot;WHERE IS&quot; WITHOUT WARRANTY 
+OF ANY KIND INCLUDING ALL IMPLIED WARRANTIES AND CONDITIONS OF MERCHANTABILITY, FITNESS 
+FOR ANY PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT.  IN NO EVENT SHALL TZWORKS, LLC 
+BE LIABLE FOR ANY KIND OF DAMAGE RESULTING FROM ANY CAUSE OR REASON, ARISING OUT OF IT 
+IN CONNECTION WITH THE USE OR PERFORMANCE OF INFORMATION AVAILABLE FROM THIS SOFTWARE. </p>
+</div>
+
+<h3>REMOVAL</h3>
+<div>
+<p>The Software are the original works of TZWorks, LLC.  However, to be in compliance with 
+the Digital Millennium Copyright Act of 1998 (&quot;DMCA&quot;) we agree to investigate and disable any 
+material for infringement of copyright. Contact TZWorks, LLC at email address: 
+<a href="mailto:info@tzworks.net">info&#64;tzworks.net</a>, regarding any DMCA concerns. </p>
+</div>
+
+<!-- 
+This is section is commented out, since it is only used by the tool binary
+
+USER_AGREEMENT_START
+-------------------------------- User Agreement -----------------------------
+
+Permission to use the TZWorks, LLC software and related documentation
+("Software") is for Demonstration and Testing use ONLY. The User Agreement, 
+Disclaimer, and/or Software may change from time to time.  By continuing to 
+use the Software after those changes become effective, you agree to be 
+bound by all such changes.  Permission to use the Software is granted 
+provided that (1) use of such Software is for Demonstration and Testing use 
+only and (2) the Software is not resold, transferred or distributed to any 
+other person or entity.  To use the Software for commercial or business 
+purposes, a separate license is required. Contact TZWorks, LLC 
+(info@tzworks.net) for more information regarding licensing. To redistribute
+the Software, approval in writing is required from TZWorks, LLC.  These 
+terms do not give the user any rights in intellectual property or technology,
+but only a limited right to use the Software for Demostrations and Testing.
+TZWorks, LLC retains all rights to ownership of this Software.
+USER_AGREEMENT_END
+
+DISCLAIMER_START
+---------------------------------- DISCLAIMER -------------------------------
+
+The user agrees that all Software made available by TZWorks, LLC is
+experimental in nature and use of the Software is at user's sole risk.  The
+Software could include technical inaccuracies or errors.  Changes are 
+periodically added to the information herein, and TZWorks, LLC may make 
+improvements and/or changes to Software and/or related documentation at any
+time.  TZWorks, LLC makes no representations about the accuracy or usability
+of the Software for any purpose.  All software are provided "AS IS" and 
+"WHERE IS" without warranty of any kind including all implied warranties and
+conditions of merchantability, fitness for any particular purpose, title and
+non-infringement.  In no event shall TZWorks, LLC be liable for any kind of 
+damage resulting from any cause or reason, arising out of it in connection
+with the use or performance of information available from this Software.
+DISCLAIMER_END
+-->
+
+
+
+
+
+<hr/><!---------------------About the <b><i>pf</i></b> Tool---------------------->
+<h2><a name="about">About the <b><i>pf</i></b> Tool</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<p><b><i>pf</i></b> is a command line version Windows prefetch parser.  Originally inspired by 
+the chapter on 'prefetch analysis' as well as the perl script sample given 
+in the book on "Windows Forensic Analysis" by Harlan Carvey [1], <b><i>pf</i></b> was 
+another tool created for eventual inclusion into a computer forensic toolkit.</p> 
+
+<p>From Wikipedia, "the prefetcher is a component of versions of Microsoft Windows 
+starting with Windows XP... that speeds up the Windows boot process, and 
+shortens the amount of time it takes to start up programs.  In Windows Vista, 
+SuperFetch and ReadyBoost extend upon the prefetcher and attempt to accelerate 
+application and boot launch times..."[3]</p>
+
+<p>A good source for a discussion on the internals of the mechanics of prefetching 
+is given in the MSDN article written by Mark Russinovich and David Solomon [2].</p>
+
+<p>The prefetcher behavior is controlled by the Windows registry entry:
+HKLM\System\CurrentControlSet\Control\Session\Manager\Memory 
+Management\PrefetchParameters. The value for "EnablePrefetcher" can have one 
+of the following values [3]:</p>
+<pre>
+    0 - Disabled
+    1 - Application launch prefetching enabled
+    2 - Boot prefetching enabled
+    3 - Application launch and boot enabled (default)
+</pre>
+
+<p>Based on various references, Windows maintains the prefetch folder up to 128 
+entries.</p>
+
+<p>To use this tool, an authentication file is required to be in the same 
+directory as the binary for the tool to run.  The non-commercial/demonstrational-use 
+EULA is part of this readme. It only activates certain capabilities of the 
+tool and is meant only for demonstration purposes.  This authentication will 
+eventually expire.  To activate all the functionality of the tool and use 
+it on a permanent basis, a separate business license needs to be purchased. 
+Contact <a href="mailto:info@tzworks.net">info&#64;tzworks.net</a> for more 
+details about the using this tool for business and/or casework use.</p>
+
+</div>
+
+<hr/><!---------------------How to use this tool---------------------->
+<h2><a name="howto">How to use this tool</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<p>Since <b><i>pf</i></b> is a command line tool, one will need to open the command
+prompt.  If trying to access the prefetch (%systemroot%\prefetch) folder while running
+Vista or beyond, one needs to be running with admin privileges.</p>
+
+<p>Below is the menu with the various options.  Details of each option can be found 
+<a href="#options">here</a>.</p>
+ 
+<pre>
+   pf - full ver: 1.03; Copyright (c) TZWorks LLC
+   
+   Usage:
+    (note: options with ** are enabled with a commercial license)
+   
+     pf &lt;filename&gt; [-csv]
+      dir c:\windows\prefetch\*.pf /b /s | pf -pipe -prevtimes &gt; results.txt
+      dir c:\windows\prefetch\*.pf /b /s | pf -pipe -v &gt; results.txt
+   
+    Basic options
+     -csv                   = output in comma separated value format
+     -v                     = verbose output, output data on multiple lines
+     -pipe                  = pipe files into app for processing
+   
+    Additional options
+     -dateformat yyyy/mm/dd = ** "mm/dd/yy" is the default
+     -timeformat hh:mm:ss   = ** "hh:mm:ss.xxx" is the default
+     -no_whitespace         = ** remove whitespace between csv delimiter
+     -csv_separator "|"     = ** use a pipe character for csv separator
+     -prevtimes             = ** scan for previous times run [win8 only]
+     -pf_path               = ** include prefetch path in output
+</pre>
+
+<p>There are 3 output formats: (1) default, which uses one line
+per prefetch file parsed and uses pipe delimiters with appropriate
+spaces to align columns, (2) [-csv] output, which uses comma separated value
+format which is good to view in excel and (3) [-v] verbose format, which uses
+multiple lines per prefetch file.  The default format and the verbose 
+format are useful to view the output in any text editor, while the 
+CSV format is useful to view in Microsoft Excel or other spreadsheet 
+application.</p>
+
+<p>One can pipe 'path\filename' of the prefetch files into <b><i>pf</i></b> using the [-pipe] switch.  
+To use this option one needs to ensure the absolute path is given.  This can be done with the
+use of the <b><i>dir</i></b> command by using the switches <b><i>/b /s</i></b>.  
+Then one can redirect the output of <b><i>pf</i></b> to a file.  See the
+example below for the use of the <b><i>dir</i></b> command:</p>
+<pre>
+    dir &lt;some directory path&gt; /b /s
+</pre>
+
+
+<p>Typical usage win32 examples include: </p>
+<pre>
+    To parse individual prefetch files, use:
+      pf  &lt;path\prefetch file&gt;                            = default output
+      pf -v &lt;path\prefetch file&gt;                          = verbose output
+
+    To parse all prefetch files in a directory, use the [-pipe] switch, eg:
+      dir c:\windows\prefetch\*.pf /b /s | pf -pipe       = default output
+      dir c:\windows\prefetch\*.pf /b /s | pf -pipe -csv  = verbose output
+
+    To redirect output of pf into a file
+      dir c:\windows\prefetch\*.pf /b /s | pf -pipe  &gt; output.txt
+      dir c:\windows\prefetch\*.pf /b /s | pf -pipe -csv&gt; output.csv
+</pre>
+
+<p>Typical usage linux examples include (assuming the windows prefetch
+  files were copied to your local linux directory): </p>
+<pre>
+    To parse individual prefetch files, use:
+      ./pf &lt;path/prefetch file&gt;                          = minimal output
+      ./pf -v &lt;path/prefetch file&gt;                       = verbose output
+
+    To parse all prefetch files in a directory, use the [-pipe] switch, eg: 
+      ls /home/Prefetch/*.pf | ./pf -pipe                = default output
+      ls /home/Prefetch/*.pf | ./pf -pipe -csv           = csv output
+
+    To redirect output of pf into a file
+      ls /home/Prefetch/*.pf | ./pf -pipe &gt; output.txt 
+      ls /home/Prefetch/*.pf | ./pf -pipe -csv &gt; output.csv
+</pre>
+</div>
+
+
+<hr/><!---------------------List of options---------------------->
+<h2><a name="options">List of options</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+<div>
+<table border="1" cellpadding="2" cellspacing="0">
+    <tr bgcolor="yellow">
+        <th>Option</th>
+        <th>Extra</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td>-csv</td>
+        <td></td>
+        <td>Outputs the data fields delimited by commas. Since filenames can have commas, to ensure 
+        the fields are uniquely separated, any commas in the filenames get converted to spaces.</td>
+    </tr>
+    <tr>
+        <td>-v</td>
+        <td></td>
+        <td>Verbose output. This option will output the parsed data as multiple lines for one
+        record inputted.</td>
+    </tr>
+    <tr>
+        <td>-pipe</td>
+        <td></td>
+        <td>Used to pipe files into the tool via STDIN (standard input).  Each file passed
+        in is parsed in sequence.</td>
+    </tr>
+    <tr>
+        <td>-prevtimes</td>
+        <td>**</td>
+        <td>Scans the prefetch file and uses heuristics to find other dates that may be 
+        present. For example, Windows 8 has other dates that document previous run times 
+        besides the last run time.</td>
+    </tr>
+    <tr>
+        <td>-no_whitespace</td>
+        <td>**</td>
+        <td>Used in conjunction with <font color="red"><i><b>-csv</b></i></font> option 
+        to remove any whitespace between the field  value and the CSV separator.</td>
+    </tr>
+    <tr>
+        <td>-csv_separator</td>
+        <td>**</td>
+        <td>Used in conjunction with the <font color="red"><i><b>-csv</b></i></font> 
+        option to change the CSV separator from the default comma to something else.
+        Syntax is <font color="red"><i><b>-csv_separator "|"</b></i></font> to change
+        the default CSV separator from a comma to pipe character</td>
+    </tr>
+    <tr>
+        <td>-dateformat</td>
+        <td>**</td>
+        <td>Output the date using the specified format. Default behavior is 
+        <font color="red"><i><b>-dateformat "mm/dd/yyyy"</b></i></font>.
+        This allows more flexibility to for a desired format.  For example, one 
+        can use this to show year first, via 
+        <font color="red"><i><b>"yyyy/mm/dd"</b></i></font> or day first, 
+        via <font color="red"><i><b>"dd/mm/yyyy"</b></i></font>, or only show 2 
+        digit years, via the <font color="red"><i><b>"mm/dd/yy"</b></i></font>. The 
+        restriction with this option is the forward slash (/) symbol needs to separate 
+        month, day and year and the month is in digit (1-12) form vice abbreviated 
+        name form. </td>
+    </tr>
+    <tr>
+        <td>-timeformat</td>
+        <td>**</td>
+        <td>Output the time using the specified format. Default behavior is 
+        <font color="red"><i><b>-timeformat "hh:mm:ss.xxx"</b></i></font>
+        One can adjust the format to microseconds, via 
+        <font color="red"><i><b>"hh:mm:ss.xxxxxx"</b></i></font> or nanoseconds, 
+        via <font color="red"><i><b>"hh:mm:ss.xxxxxxxxx"</b></i></font>, or no fractional seconds, via 
+        <font color="red"><i><b>"hh:mm:ss"</b></i></font>. The 
+        restrictions with this option is a the colon (:) symbol needs to separate hours, minutes 
+        and seconds, a period (.) symbol needs to separate the seconds and fractional seconds, and the 
+        repeating symbol 'x' to represent number of fractional seconds. (note: the the fractional 
+        seconds applies only to those time formats that have the appropriate precision available. 
+        The Windows internal filetime has, for example, 100 nsec unit precision available. 
+        The DOS time format and the UNIX 'time_t' format, however, have no fractional seconds). 
+        Some of the times represented by for this tool may use a time format without fractional 
+        seconds and therefore will not show a greater precision beyond seconds when using this 
+        option.</td>
+    </tr>
+    <tr>
+        <td>-pf_path</td>
+        <td>**</td>
+        <td>Output the prefetch file source path as part of the CSV output.  This is
+		useful for traceability when processing multiple prefetch files in an offline mode 
+		from multiple directories.  </td>
+    </tr>
+</table>
+
+<p>The options labeled as 'Extra' require a separate license for them to be unlocked.</p>
+
+</div>
+
+<hr/><!---------------------Authentication and License File---------------------->
+<h2><a name="auth">Authentication and License File</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<p>This tool has authentication built into the binary.  There are two authentication 
+mechanisms:  
+(a) the digital certificate embedded into the binary and (b) the runtime authentication.   
+For the first method, only the Windows and Mac OS-X (if available) versions have been 
+signed by an X-509 digital code signing certificate, which is validated by Windows 
+(or OS-X) during operation.  If the binary has been tampered with, the digital 
+certificate will be invalidated.</p>
+
+<p>For the second (runtime authentication) method, the authentication does two things: 
+(a) validates that the tool has a valid license and (b) validates the 
+tool's binary has not been corrupted.   The license needs to be in the same directory 
+of the tool for it to authenticate.   Furthermore any modification to the license, 
+either to its name or contents, will invalidate the license.   The runtime binary 
+validation hashes the executable that is running and fails the authentication if it 
+detects any modifications. </p>
+
+<h4><i>Limited</i> vice <i>Full</i> in the tool's output banner</h4>
+
+<p>The tools from TZWorks tools will output header information about the tool's version
+and whether it is running in <i>limited</i> or <i>full</i> mode.  This is directly related
+to what version of a license the tool authenticates with.   The <i>limited</i> keyword 
+indicates some functionality of the tool is not available, and the <i>full</i> keyword 
+indicates all the functionality is available.  The lacking functionality in the <i>limited</i>
+version may mean one or all of the following: (a) certain options may not be available, 
+(b) certain data may not be outputted in the parsed results, and (c) the license has a 
+finite lifetime before expiring.</p>
+</div>
+
+
+<hr/><!---------------------Version history---------------------->
+<h2><a name="version_history">Version history</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<ul type="square">
+	<li>01/16/2014 - v1.03 - fixed bug in creation timestamp. added option to include
+							prefetch file path to csv output.</li>
+    <li>11/18/2013 - v1.02 - tweaked authentication options for demo license.</li>
+	<li>10/09/2013 - v1.01 - added Win8 prefetch file parsing. modified the CSV output format.</li>
+    <li>08/21/2013 - v1.00 - Added new formatting options,
+    and added full path of the target file in output. </li>
+    <li>07/05/2013 - v0.99 - Updated the authentication routine.</li>
+    <li>11/03/2012 - v0.98 - maintenance update of core libraries w/ bug fixes </li>
+    <li>10/30/2012 - v0.97 - fixed bug w/ NTFS parser inadvertently added in previous version</li>
+    <li>09/29/2012 - v0.96 - added hash check to ensure binary integrity. Changed
+    the stdin syntax to now use the -pipe switch.</li>
+    <li>05/08/2012 - v0.95 - added -csv option</li>
+    <li>04/05/2012 - v0.94 - added license authentication.  </li>
+    <li>03/17/2012 - v0.93 - maintenance update</li>
+    <li>05/30/2011 - v0.92 - added 32 and 64 bit versions to the mix.</li>
+    <li>05/22/2011 - v0.91 - maintenance update</li>
+    <li>02/26/2011 - v0.9a - maintenance update</li>
+    <li>11/23/2010 - v0.9 - updated pipe error checking</li>
+    <li>10/18/2010 - v0.8 - fixed date to display seconds on filetime</li>
+    <li>08/10/2010 - v0.7 - added port to MAC OS-X 10.6, 64 bit</li>
+    <li>03/26/2009 - v0.6 - added some diagnostic checks</li>
+    <li>03/06/2009 - v0.5e - updated code to compile on linux</li>
+    <li>08/30/2009 - v0.5b - updated some supporting library code</li>
+    <li>05/23/2009 - v0.5 (beta) - 1st prototype released for testing purposes</li>
+</ul>
+</div>
+
+<hr/><!---------------------References---------------------->
+<h2><a name="references">References</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<ol>
+    <li>Windows Forensic Analysis, by Harlan Carvey, Syngress 2007</li>
+    <li>MSDN, "Windows XP: Kernel Improvements Create a More Robust, Powerful, 
+        and Scalable OS", discussion on prefetch, by Mark Russinovich 
+        and David Solomon</li>
+    <li>Wikipedia, the free encyclopedia.  Prefetch topic.</li>
+    <li>Pre-fetching of pages prior to a hard page fault sequence, US patent 
+        6,633,968, dtd 10/14/03, by Zwiegincew, et al.</li>
+</ol>
+</div>
+
+<hr/><!---------------------Copyright---------------------->
+<h5 align="right">Copyright &copy; TZWorks, LLC, All Rights Reserved <br />
+Contact Info: <a href="mailto:info@tzworks.net">info&#64;tzworks.net</a></h5>
+
+<p></p>
+<hr />
+<p></p>
+</body>
+
+</html>
+

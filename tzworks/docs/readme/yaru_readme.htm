@@ -1,0 +1,596 @@
+<html>
+
+<head>
+    <title>yaru readme</title>
+    <style type="text/css">
+        div
+        {
+            margin-left: 1em;
+        }
+    </style>
+</head>
+
+<body bgcolor="white"">
+
+<h2 align="center"><a name="index">Yet Another Registry Utility - <i>yaru</i></a></h2>
+<h3 align="center">(version 1.31)<br /><br /></h3>
+<!--WARNING_TAG-->
+<hr />
+
+<ul>
+    <li> <a href="#eula"> End User's License Agreement (EULA) </a></li>
+
+    <li> <a href="#about"> About the <b><i>yaru</i></b> Tool </a></li>
+    <li> <a href="#hives">Locations of Hives</a></li>
+    <li> <a href="#log_images">Reading Registry Hives from Logical Images</a></li>
+    <li> <a href="#cmdline">Command Line Options</a></li>
+    <li> <a href="#exporting">Exporting Registry Subkeys</a></li>
+    <li> <a href="#xml">Output XML Formated Data</a></li>
+    <li> <a href="#templates">User Defined Templates</a></li>
+    <li> <a href="#ex_templates">Template Examples</a></li>
+    <li> <a href="#issues">Known Issues</a></li>
+    <li> <a href="#auth"> Authentication and License File </a></li>
+    <li> <a href="#version_history"> Version history </a></li>
+    <li> <a href="#references"> References </a></li>
+</ul>
+
+
+
+<hr/><!---------------------EULA---------------------->
+<h2><a name="eula">TZWorks Tools included in the SANS Investigative Forensic Toolkit (SIFT)</br>
+END USER LICENSE AGREEMENT (EULA)</a></h2>
+
+<h3>USER AGREEMENT</h3>
+<div>
+<p>Permission to use the TZWorks, LLC software and related documentation (&quot;Software&quot;) 
+is for <b>Demonstration and Testing use ONLY</b>. The User Agreement, Disclaimer, and/or Software 
+may change from time to time.  By continuing to use the Software after those changes become 
+effective, you agree to be bound by all such changes.  Permission to use the Software is granted 
+provided that (1) use of such Software is for <b>Demonstration and Testing use only</b> and 
+(2) the Software is not resold, transferred or distributed to any other person or entity.  
+<i><font color="red">To use the Software for commercial or business purposes, a separate 
+license is required.</font></i> Contact TZWorks, LLC 
+(<a href="mailto:info@tzworks.net">info&#64;tzworks.net</a>) 
+for more information regarding licensing. To redistribute the Software, approval in writing 
+is required from TZWorks, LLC.  These terms do not give the user any rights in intellectual 
+property or technology, but only a limited right to use the Software for <b>Demostrations and 
+Testing</b>.  TZWorks, LLC retains all rights to ownership of this Software.</p>
+</div>
+
+<h3>DISCLAIMER</h3>    
+<div>
+<p>The user agrees that this Software is experimental in nature and use of the Software is 
+at user's sole risk.  The Software could include technical inaccuracies or errors.  Changes 
+are periodically added to the information herein, and TZWorks, LLC may make improvements and/or 
+changes to Software at any time.  TZWorks, LLC makes no representations about the accuracy or 
+usability of the Software for any purpose.</p>
+
+<p>ALL SOFTWARE ARE PROVIDED &quot;AS IS&quot; AND &quot;WHERE IS&quot; WITHOUT WARRANTY 
+OF ANY KIND INCLUDING ALL IMPLIED WARRANTIES AND CONDITIONS OF MERCHANTABILITY, FITNESS 
+FOR ANY PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT.  IN NO EVENT SHALL TZWORKS, LLC 
+BE LIABLE FOR ANY KIND OF DAMAGE RESULTING FROM ANY CAUSE OR REASON, ARISING OUT OF IT 
+IN CONNECTION WITH THE USE OR PERFORMANCE OF INFORMATION AVAILABLE FROM THIS SOFTWARE. </p>
+</div>
+
+<h3>REMOVAL</h3>
+<div>
+<p>The Software are the original works of TZWorks, LLC.  However, to be in compliance with 
+the Digital Millennium Copyright Act of 1998 (&quot;DMCA&quot;) we agree to investigate and disable any 
+material for infringement of copyright. Contact TZWorks, LLC at email address: 
+<a href="mailto:info@tzworks.net">info&#64;tzworks.net</a>, regarding any DMCA concerns. </p>
+</div>
+
+<!-- 
+This is section is commented out, since it is only used by the tool binary
+
+USER_AGREEMENT_START
+-------------------------------- User Agreement -----------------------------
+
+Permission to use the TZWorks, LLC software and related documentation
+("Software") is for Demonstration and Testing use ONLY. The User Agreement, 
+Disclaimer, and/or Software may change from time to time.  By continuing to 
+use the Software after those changes become effective, you agree to be 
+bound by all such changes.  Permission to use the Software is granted 
+provided that (1) use of such Software is for Demonstration and Testing use 
+only and (2) the Software is not resold, transferred or distributed to any 
+other person or entity.  To use the Software for commercial or business 
+purposes, a separate license is required. Contact TZWorks, LLC 
+(info@tzworks.net) for more information regarding licensing. To redistribute
+the Software, approval in writing is required from TZWorks, LLC.  These 
+terms do not give the user any rights in intellectual property or technology,
+but only a limited right to use the Software for Demostrations and Testing.
+TZWorks, LLC retains all rights to ownership of this Software.
+USER_AGREEMENT_END
+
+DISCLAIMER_START
+---------------------------------- DISCLAIMER -------------------------------
+
+The user agrees that all Software made available by TZWorks, LLC is
+experimental in nature and use of the Software is at user's sole risk.  The
+Software could include technical inaccuracies or errors.  Changes are 
+periodically added to the information herein, and TZWorks, LLC may make 
+improvements and/or changes to Software and/or related documentation at any
+time.  TZWorks, LLC makes no representations about the accuracy or usability
+of the Software for any purpose.  All software are provided "AS IS" and 
+"WHERE IS" without warranty of any kind including all implied warranties and
+conditions of merchantability, fitness for any particular purpose, title and
+non-infringement.  In no event shall TZWorks, LLC be liable for any kind of 
+damage resulting from any cause or reason, arising out of it in connection
+with the use or performance of information available from this Software.
+DISCLAIMER_END
+-->
+
+
+
+
+<hr/><!---------------------About the <b><i>yaru</i></b> Tool---------------------->
+<h2><a name="about">About the <b><i>yaru</i></b> Tool</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<p><b><i>yaru</i></b> is a minimal version of a registry viewer compared to the many others
+that are freely available on the Internet.  <b><i>yaru</i></b> was designed to try
+to parse (on a best effort basis) the Windows registry hives and display
+the results in a tree view GUI.  Inspired by the desire to look into the 
+Windows registry metadata so as to better forensically analyze the registry 
+hives, <b><i>yaru</i></b> was designed with a portable and extensible architecture in 
+mind so that it could be compiled to run on various operating systems.</p>  
+
+<p>The registry parsing engine is written in standard C/C++ and has no 
+dependencies on the Windows registry API functions.   This means that the 
+parsing may have trouble on certain untested boundary conditions.</p> 
+
+<p>The GUI portion of <b><i>yaru</i></b> leverages off the FOX (Free Objects for X) library, 
+which was designed to be cross platform. The FOX library is freely available 
+and is distributed in source form under Library GNU Public License (LGPL). 
+Currently there are compiled versions of <b><i>yaru</i></b> that will run on Windows, 
+Linux and MAC OS X.</p>
+
+<p>The windows version of <b><i>yaru</i></b> has the ability to take a snapshot of the currently 
+running hive(s) and examine them.  Since the Windows OS locks down the active 
+hives from other processes reading them, <b><i>yaru</i></b> can resort to raw ntfs disk 
+reads to read any of the desired hives.  Consequently, this requires the user 
+to run this tool with Administrative privileges.  While this approach adds 
+complexity to <b><i>yaru</i></b>, it ensures that there is no corruption or changes to the 
+active hive during analysis.</p>
+
+<p>Some other rudimentary functionality includes:</p>
+
+<ol>
+    <li>Show allocated (but unused) key value data space [referred to here
+        as cell slack space].</li>
+    <li>Show unallocated hive space [referred to here as hive slack space].</li>
+    <li>Able to traverse the hive slack space and enumerate deleted keys
+        [experimental].  Also available is the ability to enumerate all 
+        allocated chunks that are unlinked to the registry structures 
+        (eg. this would result in hidden chunks of memory).</li>
+    <li>Report generation capability.  For common registry forensics
+        artifacts, a number of options are available to generate reports 
+        from the live hives, copies of hives or hives from unmounted 
+        partition files.  The latter requires a bit-for-bit (uncompressed) 
+        copy of the partition image.</li>
+    <li>Optional logging capability that records the user selections
+        along with data values into a separate XML file for later review. A 
+        separate XML file is created for each session.</li>
+    <li>Ability to export any key in the hive under evaluation to a  
+        registration (.reg) file to be used for analysis.  The format tries 
+        to mimic the version 5.00 of the Windows registry editor, with some 
+        additional metadata in commented form.</li>
+    <li>Ability to process any hive using user defined templates.  These
+        templates allow one to customize what data is to be extracted. 
+        While these templates have a very primitive set of commands, they
+        can be useful for repetitive tasks.</li>
+    <li>Simple search capability: (a) key names, (b) value names, (c) date ranges
+    and (e) strings (that greater than 4 chars)</li>
+    <li>Version 1.06 and above has the ability to verify all allocated chunks
+        have valid links to the registry.  This was discussed in Timothy Morgan's
+        paper [ref 8] as an anti-forensics technique.</li>
+</ol>
+
+<h4>Experimental option</h4>
+
+    <p>For VMWare Virtual hard drives, there is an option to parse 'KDMV' 
+    signatured drives.  This is limited and assumes one has selected the 
+    monolithic type drive (eg. the drive is not broken into separate files).   
+    One can however, include snapshots when selected virtual hard
+    drives.  To do this, the dialog box will allow one to select 
+    multiple (monolithic tyep) VMDK files and internally reconstruct them.
+    The restriction when selecting multiple VMDK files is that one of them
+    needs to be the root VMDK file, while the others can be delta versions.</p>
+
+<h4>Functionality not included in this version</h4>
+<pre>
+    - write capability 
+</pre>
+
+<p>To use this tool, an authentication file is required to be in the same 
+directory as the binary for the tool to run.  The non-commercial/demonstrational-use 
+EULA is part of this readme. It only activates certain capabilities of the 
+tool and is meant only for demonstration purposes.  This authentication will 
+eventually expire.  To activate all the functionality of the tool and use 
+it on a permanent basis, a separate business license needs to be purchased. 
+Contact <a href="mailto:info@tzworks.net">info&#64;tzworks.net</a> for more 
+details about the using this tool for business and/or casework use.</p>
+</div>
+
+
+<hr/><!---------------------Locations of hives---------------------->
+<h2><a name="hives">Locations of Hives</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<p>The User Hives are located here:</p>
+<ul>
+    <li>%userprofile%\ntuser.dat</li>
+    <li>(xp) %userprofile%\Local Settings\Application Data\Microsoft\Windows\UsrClass.dat</li>
+    <li>(vista/win7) %userprofile%\AppData\Local\Microsoft\Windows\UsrClass.dat</li>
+</ul>
+
+<p>The other hives (system, software, sam, security, components) are located here:</p>
+<ul>
+    <li>%systemroot%\system32\config\&lt;system, software, sam, security, etc&gt;</li>
+</ul>
+
+<p>On XP, hives that are part of the restore points at located at:</p>
+<ul>
+    <li>System Volume Information\_restore{&lt;GUID&gt;}\RPx\snapshot\&lt;various hives&gt;</li>
+</ul>
+
+<p>On Vista and later operating systems, the BCD - Boot Configuration Data hive is at:</p>
+<ul>
+    <li> %systemdrive%\boot\bcd</li>
+</ul>
+</div>
+
+
+<hr/><!---------------------Reading Registry Hives from Logical Images---------------------->
+<h2><a name="log_images">Reading Registry Hives from Logical Images</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<p>Under certain conditions, <b><i>yaru</i></b> should be able to read the registry hives 
+directly from a logical image that was saved as a file (without mounting
+the image as a file system).   I hesitated to make this option available,
+since there are a number of boundary conditions that need to be considered.
+These include:</p>
+
+<ol>
+    <li><b><i>yaru</i></b> assumes the ntfs unmounted partition is a single file and is a
+    binary match of the original logical partition.  Given these assumptions 
+    <b><i>yaru</i></b> has a chance of reading directly from the unmounted partition and pull 
+    out the desired registry.</li>
+    <li>From the cmdline, one can invoke this via the following switch:<pre>
+    -ntfsimage &lt;unmounted partition&gt; &lt;path\file of the hive&gt;</pre></li>
+
+    <li>From the cmd template file, using !cmd, the following options are used:<pre>
+	-image &lt;unmounted ntfs partition as a single file&gt;
+	-hive &lt;path/file of the hive to be analyzed&gt;</pre></li>
+</ol>
+
+		
+<p>Since, in this case, the registry path of the hive is not mounted, it 
+doesn't have a drive letter when specifying where the hive file is. 
+Below is an example of the expected syntax when specifying the system
+hive in its native location:</p>
+	
+<pre>
+	-hive \Windows\system32\config\system
+</pre>
+</div>
+
+
+<hr/><!---------------------Command Line Options---------------------->
+<h2><a name="cmdline">Command Line Options</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<p>! NOTE !  when running in windows, <b><i>yaru</i></b> can't output to the console, but 
+one can redirect the standard output (stdout) to a file.  Use this 
+approach when using cmds that don't invoke the GUI.</p>
+
+<pre>
+    Commands to use with GUI [opens the GUI with the hive specified]
+    -hivefile &lt;filename&gt;   
+    -ntfsimage &lt;unmounted partition&gt; &lt;path\file of the hive&gt;
+    
+    Cmds that do not invoke the GUI
+    -cmdfile &lt;filename&gt;    = run <b><i>yaru</i></b> from a cmdfile with a list of !cmds 
+    -cmd &lt;options&gt;         = run a command using the <b><i>yaru</i></b> registry engine.
+</pre>
+</div>
+
+<hr/><!---------------------Exporting Registry Subkeys---------------------->
+<h2><a name="exporting">Exporting Registry Subkeys</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<p>Registry exported files from windows are formatted as unicode format.
+Consequently when trying to view them in linux, one needs to select a
+character encoding that is Unicode (eg. UTF-16).</p>
+</div>
+
+<hr/><!---------------------Output XML Formated Data---------------------->
+<h2><a name="xml">Output XML Formated Data</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<p>XML output is formatted as UTF-8 encoding.   Currently a default XML style
+sheet is provided so the results can be viewed with a browser, but can any 
+text editor can view the results.</p>
+</div>
+
+
+<hr/><!---------------------User Defined Templates---------------------->
+<h2><a name="templates">User Defined Templates</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<p>These are text files that allow one to automate key/value extraction.  The
+parsing rules for these templates are as follows:</p>
+
+<pre>
+    General Rules.
+        1. each line is parsed separately
+        2. a line that starts w/ a double forward slash (eg //) is ignored
+            and used for comments
+        3. a blank line is ignored
+        4. any line not satisfying Rule 2 & 3 above is assumed to be a command.
+        5. all command lines are in CSV (comma separated value) format
+
+    Commands lines
+        1. must start with the sequence:   !cmd
+        2. and contain the following options, CSV delimited (in any order):
+            -enumreg
+            -key, &lt;key path&gt;  [use ?* for a wildcard key/subkey, '?*' is used
+                          for a wildcard since '*' is a valid subkey name]
+            -hive, &lt;registry hive path&gt;
+            -level, &lt;num of levels to recurse, 0 equates to the current level&gt;
+            [-enumvalues | -enumkeys]
+
+        3. other options are available but are not required. They depend on 
+           the key/value that is extracted.   For example:
+
+            [-sort_by_name | -sort_by_date] 
+                either one can be used, but not both.  [-sort_by_date] is only
+                applicable to key/subkey names and not value names, whereas
+                [-sort_by_name] is applicable to either key or value names.
+
+            -stream_mru
+                for binary StreamMRU data. 
+                (The following key uses binary link data:
+                 NTUSER.DAT\Software\Microsoft\Windows\CurrentVersion\Explorer\StreamMRU)
+
+            -userassist
+                parses the userassist data into readable strings
+                (eg. NTUSER.DAT\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\{75048700-EF1F-11D0-9888-006097DEACF9}\Count)
+
+            -recentdocs
+                parses the recentdocs data into readable strings
+                (eg. NTUSER.DAT\Software\Microsoft\Windows\CurrentVersion\Explorer\RecentDocs)
+
+            reading a hive from an unmounted partition
+            -image &lt;unmounted ntfs partition as a single file&gt; -hive &lt;path/file of the hive to be analyzed&gt;
+</pre>
+
+<h4>Running a user defined template</h4>
+
+
+<p>To run a template, in file menu, select 'Run CmdFile', whereupon an open
+    file dialog box will allow you to navigate to the template file you wish
+    to run.</p>
+</div>
+
+<hr/><!---------------------Template Examples---------------------->
+<h2><a name="ex_templates">Template Examples</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<p>Below is an example of extracting USB thumb drive forensics artifacts for an XP 
+box.  Note that some of the commands extract data from the system hive while 
+others extract data from the the user hives.  For the user hives, a wildcard is 
+used to traverse all user hives on a particular box.  Note: for a vista or 
+windows 7 box, some of the registry values are different.</p>
+
+
+<pre>
+// 1. Record the (a) Vendor (b) Product (c) Version and (d) serial numbers for 
+//      all child keys
+//
+!cmd, -enumreg, -key, HKLM\SYSTEM\CurrentControlSet\Enum\USBSTOR\?*\, -hive, c:\windows\system32\config\system, -level, 0, -sort_by_date, -enumkeys
+
+// 2. Record the Parent Prefix ID
+//      Note: the use of wildcards for subkeys prior to the ParentIdPrefix.  
+//         In this case we are only want the subkeys that have the 
+//         ParentIdPrefix.
+//
+!cmd, -enumreg, -key, HKLM\SYSTEM\CurrentControlSet\Enum\USBSTOR\?*\?*\ParentIdPrefix, -hive, c:\windows\system32\config\system, -level, 0, -sort_by_date, -enumvalues
+
+// 3. Determine the Vendor ID (VID) and Product ID (PID) based on the S/N
+//
+!cmd, -enumreg, -key, HKLM\SYSTEM\CurrentControlSet\Enum\USB\?*, -hive, c:\windows\system32\config\system, -level, 0, -sort_by_date, -enumkeys
+
+// 4. Determine the driver letter the device is mapped to
+//
+!cmd, -enumreg, -key, HKLM\SYSTEM\MountedDevices\, -hive, c:\windows\system32\config\system, -level, 0, -mounted_devices, -enumvalues
+
+// 5. Find the user that used the specific USD device
+//
+!cmd, -enumreg, -key, NTUSER.DAT\Software\Microsoft\Windows\CurrentVersion\Explorer\MountPoints2, -hive, C:\Documents and Settings\?*\ntuser.dat, -level, 0, -sort_by_date, -enumkeys
+
+// 6. Determine the first time the device was connected after the last reboot
+//
+!cmd, -enumreg, -key, HKLM\SYSTEM\CurrentControlSet\Control\DeviceClasses\{53f56307-b6bf-11d0-94f2-00a0c91efb8b}, -hive, c:\windows\system32\config\system, -level, 0, -sort_by_date, -enumkeys
+</pre>
+</div>
+
+<hr/><!---------------------Known issues---------------------->
+<h2><a name="issues">Known Issues</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<ol>
+    <li>Access to active hives.  One is required to run <b><i>yaru</i></b> under administrative 
+    privileges to get read access to the raw NTFS clusters storing the live hives.  
+    When running under Vista or Windows 7, any network shares established prior 
+    as a regular (non-admin) user, will be isolated from other accounts 
+    (including the admin account).  This problem occurs because User Account 
+    Control (UAC) treats members of the Administrators group as standard users. 
+    Therefore, network shares that are mapped by logon scripts are shared with 
+    the standard user access token instead of with the full administrator access 
+    token.</li>
+    <li><b><i>yaru</i></b> may run out of memory processing some very large registry hives with 
+    many deleted files. To address this issue, a 64 bit version of <b><i>yaru</i></b> was created.</li>
+    <li>When using <b><i>yaru</i></b> to compare .reg files from two different snapshots in time
+    where the snapshots are generated from tools other than <b><i>yaru</i></b> (eg. from 
+    regedit.exe) one needs to ensure the .reg file is saved in the old 
+    NT4 format (which is text based) vice the default format (which is binary
+    based).  <b><i>yaru</i></b>'s comparison option only works with text based .reg files.</li>
+</ol>
+</div>
+
+<hr/><!---------------------Authentication and License File---------------------->
+<h2><a name="auth">Authentication and License File</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<p>This tool has authentication built into the binary.  There are two authentication 
+mechanisms:  
+(a) the digital certificate embedded into the binary and (b) the runtime authentication.   
+For the first method, only the Windows and Mac OS-X (if available) versions have been 
+signed by an X-509 digital code signing certificate, which is validated by Windows 
+(or OS-X) during operation.  If the binary has been tampered with, the digital 
+certificate will be invalidated.</p>
+
+<p>For the second (runtime authentication) method, the authentication does two things: 
+(a) validates that the tool has a valid license and (b) validates the 
+tool's binary has not been corrupted.   The license needs to be in the same directory 
+of the tool for it to authenticate.   Furthermore any modification to the license, 
+either to its name or contents, will invalidate the license.   The runtime binary 
+validation hashes the executable that is running and fails the authentication if it 
+detects any modifications. </p>
+
+<h4><i>Limited</i> vice <i>Full</i> in the tool's output banner</h4>
+
+<p>The tools from TZWorks tools will output header information about the tool's version
+and whether it is running in <i>limited</i> or <i>full</i> mode.  This is directly related
+to what version of a license the tool authenticates with.   The <i>limited</i> keyword 
+indicates some functionality of the tool is not available, and the <i>full</i> keyword 
+indicates all the functionality is available.  The lacking functionality in the <i>limited</i>
+version may mean one or all of the following: (a) certain options may not be available, 
+(b) certain data may not be outputted in the parsed results, and (c) the license has a 
+finite lifetime before expiring.</p>
+</div>
+
+<hr/><!---------------------Version history---------------------->
+<h2><a name="version_history">Version history</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<ul type="square">
+	<li>01/16/2014 - v1.31 - updated the LNK parsing engine to handle additional shell ItemIDs. this
+							affects various reports generated that internally use ItemIds.</li>
+	<li>11/25/2013 - v1.30 - fixed boundardary condition for shimcache parsing on win8</li>
+    <li>11/18/2013 - v1.29 - updated option to export any of the values as a binary blob. included
+                            app compatibility (shim cache) parsing in the system hive report. Fixed
+                            bug in hex offsets for find option. Fixed bug in parsing certain
+                            boundary conditions.</li>
+	<li>10/09/2013 - v1.28 - Added date format options and well as time resolution options.
+                            Fixed boundary condition in older 32 bit Linux builds. </li>
+    <li>08/22/2013 - v1.27 - Added context parse for IDList/SHITEM type data structs to
+                                help with reversing. (commercial version only). Removed
+                                some previous functionality that was more useful to reversing
+                                rather than for 'personal-use'. All functionality is 
+                                retained for commercial users.</li>
+    <li>07/05/2013 - v1.26 - Added drag-n-drop to the Windows version and 
+                            updated the authentication routine</li>
+    <li>04/20/2013 - v1.25 - Under report generaion, fixed some parsing boundary conditions on 
+                            certain artifacts.</li>
+    <li>03/15/2013 - v1.24 - updated fox library to latest stable version (1.6.47)</li>
+    <li>02/29/2013 - v1.23 - fixed bugs in GUI hotkeys for menu as well as other reported
+                            bugs that caused <b><i>yaru</i></b> to crash</li>
+    <li>11/03/2012 - v1.22 - maintenance update of core libraries w/ bug fixes </li>
+    <li>10/30/2012  - v1.21 - fixed bug w/ NTFS inadvertently added in previous version</li>
+    <li>10/13/2012  - v1.20 - fixed boundary condition. added hash check to ensure binary integrity</li>
+    <li>07/17/2012  - v1.19 - fixed bug in vmware option for linux/mac</li>
+    <li>05/30/2012  - v1.18 - beefed up the reports, and other misc improvements
+    displayed output.  fixed miscellaneous bugs.</li>
+    <li> 04/05/2012 - v1.17 - added license authentication. </li>
+    <li>03/17/2012 - v1.16 - maintenance updates.</li>
+    <li>12/26/2011 - v1.15 - maintenance updates. also added data view right clk option
+        to extract data to a file. </li>
+    <li>06/10/2011 - v1.14 - added prompt for log file location</li>
+    <li>05/29/2011 - v1.13 - Updated to the Fox v1.6.43 library. Added 64 bit native build
+        to the mix. Fixed a couple of bugs (hives using ntfs compression and threading lockup
+        issues).</li>
+    <li>04/09/2011 - v1.12 - incorporated ability to extract registry hives from a VMWare
+        monolithic disk.</li>
+    <li>03/27/2011 - v1.11 - (a) fixed a number of bugs that were introduced with earlier
+        updates. (b) bcd hive is now accessible if located on the boot partition. (c) accessing
+        user hives access is more 'user' friendly</li>
+    <li>03/20/2011 - v1.10 - fixed bug in boundary condition</li>
+    <li>02/26/2011 - v1.09a - maintenance update</li>
+    <li>01/16/2011 - v1.09 - fixed bug in handling certain cluster boundary conditions.</li>
+    <li>01/07/2011 - v1.08 - modified the detection of deleted 'nk' records to be more robust
+        to invalid entries</li>
+    <li>08/10/2010 - v1.07 - fixed format problem w/ reg format to screen and ported this
+        version over to OS-X</li>
+    <li>07/25/2010 - v1.06a - fixed some thread synchronization issues</li>
+    <li>07/07/2010 - v1.06 - incorporated option to scan for allocated chunks that are hidden.
+        also put enumeration of all chunks on a separate thread, so one can analyze the
+        registry during enumeration.</li>
+    <li>06/26/2010 - v1.05a - misc fixes and additional shortcuts to live registry hives
+        for vista and win7.</li>
+    <li>06/14/2010 - v1.05 - additional error checking on input files fixed bug in log file
+        generation added pulling password hashes from unmounted image</li>
+    <li>05/23/2010 - v1.04c - check for admin privileges when running certain options in
+        win2k or xp.</li>
+    <li>05/06/2010 - v1.04b - added classname data as part of the output for those keys that
+        contain it </li>
+    <li>05/01/2010 - v1.04a - modified the report generated for usb artifacts</li>
+    <li>04/25/2010 - v1.04 - fixed many bugs - added some searching functionality - final
+        version submitted as part of CFRS 500 course project at GMU.</li>
+    <li>04/02/2010 - v1.03c - added option to generate a report on the currently loaded hive</li>
+    <li>04/01/2010 - v1.03b - fixed bug w/ logging of monitoring deleted keys</li>
+    <li>03/30/2010 - v1.03a - bug fixes related to displaying deleted registry keys</li>
+    <li>03/28/2010 - v1.03 - added a number of new options, including viewing hive slack
+        space, deleted registry keys, and some reporting options.</li>
+    <li>xxxxxxxxx - v1.02 - intermediate test case for enumerating deleted registry keys</li>
+    <li>03/07/2010 - v1.01 - bug fixes</li>
+    <li>02/28/2010 - v1.00 - first release [uses FOX lib version 1.6.37]</li>
+</ul>
+</div>
+
+<hr/><!---------------------References---------------------->
+<h2><a name="references">References</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<ol>
+    <li>Document on various Internet sites titled "WinReg.txt" by B.D.</li>
+    <li>Various articles in MSDN.</li>
+    <li>Windows Forensic Analysis DVD Toolkit, Harlan Carvey </li>
+    <li>Wikipedia, the free encyclopedia section on <a href="http://en.wikipedia.org/wiki/Windows_Registry">Windows Registry</a>.</li>
+    <li>Various forensic artifacts discussed in Computer Forensic Essentials from <a href="http://forensics.sans.org">SANS Institute</a>.</li>
+    <li>Forensic Analysis of Unallocated Space in Windows Registry Hive Files,
+        by Jolanta Thomassen, Dissertation for Master of Science submitted to
+        The University of Liverpool, dated 04 Nov 2008.</li>
+    <li>The Internal Structure of the Windows Registry, by Peter Norris,
+        MSc Thesis submitted Defence College of Management and Technology, 
+        Dept of Informatics and Sensors, Cranfield University. Feb 2009.</li>
+    <li>Recovering Deleted Data from the Windows Registry, by Timothy D. Morgan,
+        Digital Investigation 5 (2008) S33-S41.</li>
+    <li><a href="http://www.fox-toolkit.org/">FOX-toolkit</a> version 1.6.47.</li>
+</ol>
+</div>
+
+<hr/><!---------------------Copyright---------------------->
+<h5 align="right">Copyright &copy; TZWorks, LLC, All Rights Reserved <br />
+Contact Info: <a href="mailto:info@tzworks.net">info&#64;tzworks.net</a></h5>
+
+<p></p>
+<hr />
+<p></p>
+</body>
+
+</html>
+
