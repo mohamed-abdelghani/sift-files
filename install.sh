@@ -13,3 +13,6 @@ cp samba/* /etc/samba
 mkdir -p /usr/local/share/tzworks
 cp tzworks/bin/* /usr/local/bin
 cp -R tzworks/docs/* /usr/local/share/tzworks
+
+# Misc Scripts
+cp scripts/* /usr/local/bin
