@@ -1,0 +1,459 @@
+<html>
+
+<head>
+    <title>id readme</title>
+    <style type="text/css">
+        div
+        {
+            margin-left: 1em;
+        }
+    </style>
+</head>
+
+<body bgcolor="white"">
+
+<h2 align="center"><a name="index">Windows 'index.dat' Parser - <i>id</i></a></h2>
+<h3 align="center">(version 0.64)<br /><br /></h3>
+<!--WARNING_TAG-->
+<hr />
+
+<ul>
+    <li> <a href="#eula"> End User's License Agreement (EULA) </a></li>
+
+    <li> <a href="#about"> About the <b><i>id</i></b> Tool </a></li>
+    <li> <a href="#locations"> Some Common Locations of index.dat files </a></li>
+    <li> <a href="#examples"> Examples of <b><i>id</i></b> usage </a></li>
+    <li> <a href="#piping"> Piping files into <b><i>id</i></b> </a></li>
+    <li> <a href="#options">List of options</a></li>
+    <li> <a href="#auth"> Authentication and License File </a></li>
+    <li> <a href="#version_history"> Version history </a></li>
+    <li> <a href="#references"> References </a></li>
+</ul>
+
+
+
+<hr/><!---------------------EULA---------------------->
+<h2><a name="eula">TZWorks Tools included in the SANS Investigative Forensic Toolkit (SIFT)</br>
+END USER LICENSE AGREEMENT (EULA)</a></h2>
+
+<h3>USER AGREEMENT</h3>
+<div>
+<p>Permission to use the TZWorks, LLC software and related documentation (&quot;Software&quot;) 
+is for <b>Demonstration and Testing use ONLY</b>. The User Agreement, Disclaimer, and/or Software 
+may change from time to time.  By continuing to use the Software after those changes become 
+effective, you agree to be bound by all such changes.  Permission to use the Software is granted 
+provided that (1) use of such Software is for <b>Demonstration and Testing use only</b> and 
+(2) the Software is not resold, transferred or distributed to any other person or entity.  
+<i><font color="red">To use the Software for commercial or business purposes, a separate 
+license is required.</font></i> Contact TZWorks, LLC 
+(<a href="mailto:info@tzworks.net">info&#64;tzworks.net</a>) 
+for more information regarding licensing. To redistribute the Software, approval in writing 
+is required from TZWorks, LLC.  These terms do not give the user any rights in intellectual 
+property or technology, but only a limited right to use the Software for <b>Demostrations and 
+Testing</b>.  TZWorks, LLC retains all rights to ownership of this Software.</p>
+</div>
+
+<h3>DISCLAIMER</h3>    
+<div>
+<p>The user agrees that this Software is experimental in nature and use of the Software is 
+at user's sole risk.  The Software could include technical inaccuracies or errors.  Changes 
+are periodically added to the information herein, and TZWorks, LLC may make improvements and/or 
+changes to Software at any time.  TZWorks, LLC makes no representations about the accuracy or 
+usability of the Software for any purpose.</p>
+
+<p>ALL SOFTWARE ARE PROVIDED &quot;AS IS&quot; AND &quot;WHERE IS&quot; WITHOUT WARRANTY 
+OF ANY KIND INCLUDING ALL IMPLIED WARRANTIES AND CONDITIONS OF MERCHANTABILITY, FITNESS 
+FOR ANY PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT.  IN NO EVENT SHALL TZWORKS, LLC 
+BE LIABLE FOR ANY KIND OF DAMAGE RESULTING FROM ANY CAUSE OR REASON, ARISING OUT OF IT 
+IN CONNECTION WITH THE USE OR PERFORMANCE OF INFORMATION AVAILABLE FROM THIS SOFTWARE. </p>
+</div>
+
+<h3>REMOVAL</h3>
+<div>
+<p>The Software are the original works of TZWorks, LLC.  However, to be in compliance with 
+the Digital Millennium Copyright Act of 1998 (&quot;DMCA&quot;) we agree to investigate and disable any 
+material for infringement of copyright. Contact TZWorks, LLC at email address: 
+<a href="mailto:info@tzworks.net">info&#64;tzworks.net</a>, regarding any DMCA concerns. </p>
+</div>
+
+<!-- 
+This is section is commented out, since it is only used by the tool binary
+
+USER_AGREEMENT_START
+-------------------------------- User Agreement -----------------------------
+
+Permission to use the TZWorks, LLC software and related documentation
+("Software") is for Demonstration and Testing use ONLY. The User Agreement, 
+Disclaimer, and/or Software may change from time to time.  By continuing to 
+use the Software after those changes become effective, you agree to be 
+bound by all such changes.  Permission to use the Software is granted 
+provided that (1) use of such Software is for Demonstration and Testing use 
+only and (2) the Software is not resold, transferred or distributed to any 
+other person or entity.  To use the Software for commercial or business 
+purposes, a separate license is required. Contact TZWorks, LLC 
+(info@tzworks.net) for more information regarding licensing. To redistribute
+the Software, approval in writing is required from TZWorks, LLC.  These 
+terms do not give the user any rights in intellectual property or technology,
+but only a limited right to use the Software for Demostrations and Testing.
+TZWorks, LLC retains all rights to ownership of this Software.
+USER_AGREEMENT_END
+
+DISCLAIMER_START
+---------------------------------- DISCLAIMER -------------------------------
+
+The user agrees that all Software made available by TZWorks, LLC is
+experimental in nature and use of the Software is at user's sole risk. The
+Software could include technical inaccuracies or errors.  Changes are 
+periodically added to the information herein, and TZWorks, LLC may make 
+improvements and/or changes to Software and/or related documentation at any
+time.  TZWorks, LLC makes no representations about the accuracy or usability
+of the Software for any purpose.  All software are provided "AS IS" and 
+"WHERE IS" without warranty of any kind including all implied warranties and
+conditions of merchantability, fitness for any particular purpose, title and
+non-infringement.  In no event shall TZWorks, LLC be liable for any kind of 
+damage resulting from any cause or reason, arising out of it in connection
+with the use or performance of information available from this Software.
+DISCLAIMER_END
+-->
+
+
+
+<hr/><!---------------------About the <b><i>id</i></b> Tool---------------------->
+<h2><a name="about">About the <b><i>id</i></b> Tool</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<p><b>id</b> is a cmdline version of a index.dat parser.  While there are other
+index.dat parsers freely available, we wanted a tool that was fast, cross-platform 
+and flexible in architecture for additional enhancements. </p>
+
+<p>From Wikipedia, "the index.dat file functions as an active database, which
+runs as long as a user is logged on... It functions as a repository
+of redundant information, such as web URLs, search queries and recently 
+opened files.  Its role is similar to that of an index file in the field of
+databases, where a technique called 'indexing' stores the contents of a 
+database in a different order to help speed up query responses".</p>
+
+<p>Since the Windows operating system uses these files as databases, they 
+are locked.  This makes it is difficult to remove them.  Coupled with the 
+fact they (a) record user history, (b) store URLs that are visited and 
+(c) cookies, these files are useful in computer forensics.  </p>
+
+<p>To use this tool, an authentication file is required to be in the same 
+directory as the binary for the tool to run.  The non-commercial/demonstrational-use 
+EULA is part of this readme. It only activates certain capabilities of the 
+tool and is meant only for demonstration purposes.  This authentication will 
+eventually expire.  To activate all the functionality of the tool and use 
+it on a permanent basis, a separate business license needs to be purchased. 
+Contact <a href="mailto:info@tzworks.net">info&#64;tzworks.net</a> for more 
+details about the using this tool for business and/or casework use.</p>
+</div>
+
+<hr/><!---------------------Some Common Locations of index.dat files---------------------->
+<h2><a name="locations">Some Common Locations of index.dat files</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<pre>
+    [... Pre Vista ...]
+
+    History files
+        %userprofile%\Local Settings\History\History.IE5\
+        %userprofile%\Local Settings\History\History.IE5\MSHist*\
+        
+    Cache
+        %userprofile%\Local Settings\Temporary Internet Files\Content.IE5\
+        %userprofile%\Local Settings\Application Data\Microsoft\Feeds Cache\
+        %userprofile%\Local Settings\Application Data\Microsoft\Internet Explorer\UserData\
+        %userprofile%\Local Settings\Application Data\Microsoft\Internet Explorer\DOMStore\
+        %userprofile%\IECompatCache\
+        %userprofile%\IETldCache\
+        %userprofile%\PrivacIE\
+        %userprofile%\UserData\
+        
+    Cookies
+        %userprofile%\Cookies
+        
+    [... Vista and Windows 7 ...]
+
+    History files
+        %userprofile%\AppData\Local\Microsoft\Windows\History\History.IE5
+        %userprofile%\AppData\Local\Microsoft\Windows\History\History.IE5\MSHist*\
+        %userprofile%\AppData\Local\Microsoft\Windows\History\Low\History.IE5  (unprivileged)
+        
+    Cache
+        %userprofile%\AppData\Local\Microsoft\Windows\Temporary Internet Files\Content.IE5
+        %userprofile%\AppData\Local\Microsoft\Windows\Temporary Internet Files\Low\Content.IE5  
+        %userprofile%\AppData\Local\Microsoft\Windows\Feeds Cache\
+        %userprofile%\AppData\Roaming\Microsoft\Windows\IECompatCache\
+        %userprofile%\AppData\Roaming\Microsoft\Windows\IECompatCache\Low\
+        %userprofile%\AppData\Roaming\Microsoft\Windows\IETldCache\
+        %userprofile%\AppData\Roaming\Microsoft\Windows\IETldCache\Low\
+        %userprofile%\AppData\Roaming\Microsoft\Windows\IETldCache\Low\
+        
+    Cookies
+        %userprofile%\AppData\Roaming\Microsoft\Windows\Cookies\
+        %userprofile%\AppData\Roaming\Microsoft\Windows\Cookies\Low\ 
+        %userprofile%\AppData\LocalLow\Microsoft\Internet Explorer\DOMStore\
+        %userprofile%\AppData\Roaming\Microsoft\Internet Explorer\UserData\Low\ 
+</pre>
+</div>
+
+
+<hr/><!---------------------Examples of <b><i>id</i></b> usage---------------------->
+<h2><a name="examples">Examples of <b><i>id</i></b> usage</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+
+<p>One can display the menu options by typing in the executable's name with no 
+parameters.  Below is the menu with the various options.  Details of each option can be found 
+<a href="#options">here</a>.</p>
+<pre>
+   id - full ver: 0.64; Copyright (c) TZWorks LLC
+   
+   Usage:
+    (note: options with ** are enabled with a commercial license)
+   
+     id -f &lt;file&gt;
+     id -partition &lt;drive letter&gt;          = ** Partition scan
+     id -vmdk "&lt;file1&gt; | &lt;file2&gt; | ..."    = ** VMWare disk scan
+       dir "%userprofile%\*index.dat" /b /s [/a:h] | id -pipe
+   
+    Basic options
+     -pipe                  = pipe files into app for processing
+     -locale                = use user acct locale info for date formatting
+</pre>
+
+<pre>
+   <b>id</b> -f &lt;path\index.dat&gt; [-locale]
+        -locale = uses the user acct locale info for date formatting
+
+ 1. to pipe a directory listing into this tool, use the [-pipe] syntax:
+
+  -for index.dat files that have the hidden attribute set
+    dir "%userprofile%\*index.dat" /a:h /b /s | <b>id</b> -pipe
+
+  -otherwise use the following:
+    dir "%userprofile%\*index.dat" /b /s | <b>id</b> -pipe
+
+ 2. experimental partition scan option
+    <b>id</b> -partition &lt;drive letter&gt; [-locale]
+
+ 3. experimental vmware disk scan option
+    <b>id</b> -vmdk "&lt;file1&gt; | &lt;file2&gt; | ..." [-locale]
+</pre>
+</div>
+
+
+<hr/><!---------------------Piping files into <b><i>id</i></b>---------------------->
+<h2><a name="piping">Piping files into <b><i>id</i></b></a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<h4>Windows specific</h4>
+<p>When trying to pipe the contents of a directory listing using the Windows 
+'dir' command, ensure the correct switches are used w/ the dir to enumerate the 
+index.dat files.  Depending Windows explorer viewing settings, you may need to 
+use the attribute to display hidden files.</p>
+
+<p>Windows Example 1: (for pre Vista index.dat files): Piping all occurrences of index.dat 
+within the 'Documents and Settings' directory If the index.dat has the hidden 
+attribute set, then use:</p>
+<pre>
+    dir "c:\Documents and Settings\*index.dat" /a:h /b /s | <b>id</b>.exe -pipe
+</pre>
+    
+<p>If the index.dat files don't have the hidden attribute set, then use:</p>
+<pre>
+    dir "c:\Documents and Settings\*index.dat" /b /s | <b>id</b>.exe -pipe
+</pre>
+        
+
+<p>Windows Example 2 (for Vista and Windows 7 index.dat files): Piping all 
+occurrences of index.dat within the 'Users' directory.  The case shown assumes 
+the index.dat files have the hidden attribute set.</p>
+<pre>
+    dir "c:\Users\*index.dat" /a:h /b /s | <b>id</b>.exe -pipe
+    dir "c:\Users\*index.dat" /b /s | <b>id</b>.exe -pipe
+</pre>
+
+<p>To redirect output from stdout to a file</p>
+<pre>
+    dir "c:\Users\*index.dat" /a:h /b /s | <b>id</b>.exe -pipe &gt; c:\dump\parsed.txt
+    dir "c:\Users\*index.dat" /b /s | <b>id</b>.exe -pipe &gt; c:\dump\parsed.txt
+</pre>    
+
+
+<h4>Linux/OS-X specific</h4>
+<p>When trying to pipe a set of index.dat files in various directories, one can use the 
+'find' command and pipe the output into <b>id</b> and redirect the final output to the 
+results file, like this:</p>
+<pre>
+     find /home/&lt;some dir&gt; -name *.dat -type f | ./<b>id</b> -pipe &gt; results
+</pre>
+
+</div>
+
+
+<hr/><!---------------------List of options---------------------->
+<h2><a name="options">List of options</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<table border="1" cellpadding="2" cellspacing="0">
+    <tr bgcolor="yellow">
+        <th>Option</th>
+        <th>Extra</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td>-f</td>
+        <td></td>
+        <td>Specifies the file to parse. Syntax is 
+        <font color="red"><i><b>-f &ltfilename&gt</b></i></font></td>
+    </tr>
+    <tr>
+        <td>-pipe</td>
+        <td></td>
+        <td>Used to pipe files into the tool via STDIN (standard input).  Each file passed
+        in is parsed in sequence.</td>
+    </tr>
+    <tr>
+        <td>-locale</td>
+        <td></td>
+        <td>Use the system local of the user account to perform date formatting. 
+        [this option is very experimental].  Invoking this option for a en-US 
+        system would be MM/DD/YYYY.  For a fr-FR system, the format should be 
+        DD/MM/YYYY.  Time remains at HH:MM:SS.MSEC, independent of the system locale.
+        </td>
+    </tr>
+
+    <tr>
+        <td>-partition</td>
+        <td>**</td>
+        <td>Windows only option. Extract artifacts from a mounted Windows volume. The syntax is 
+        <font color="red"><i><b>-partition &lt;drive letter&gt;</b></i></font>.</td>
+    </tr>
+    <tr>
+        <td>-vmdk</td>
+        <td>**</td>
+        <td> Extract artifacts from a VMWare monolithic NTFS formatted volume. The syntax is 
+        <font color="red"><i><b>-vmdk "disk"</b></i></font>.  For a collection
+        of VMWare disks that include snapshots, one can use the following syntax: 
+         <font color="red"><i><b>-vmdk "disk1 | disk2 | ..."</b></i></font></td>
+    </tr>
+</table>
+
+<p>The options labeled as 'Extra' require a separate license for them to be unlocked.</p>
+
+</div>
+
+<hr/><!---------------------Authentication and License File---------------------->
+<h2><a name="auth">Authentication and License File</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<p>This tool has authentication built into the binary.  There are two authentication 
+mechanisms:  
+(a) the digital certificate embedded into the binary and (b) the runtime authentication.   
+For the first method, only the Windows and Mac OS-X (if available) versions have been 
+signed by an X-509 digital code signing certificate, which is validated by Windows 
+(or OS-X) during operation.  If the binary has been tampered with, the digital 
+certificate will be invalidated.</p>
+
+<p>For the second (runtime authentication) method, the authentication does two things: 
+(a) validates that the tool has a valid license and (b) validates the 
+tool's binary has not been corrupted.   The license needs to be in the same directory 
+of the tool for it to authenticate.   Furthermore any modification to the license, 
+either to its name or contents, will invalidate the license.   The runtime binary 
+validation hashes the executable that is running and fails the authentication if it 
+detects any modifications. </p>
+
+<h4><i>Limited</i> vice <i>Full</i> in the tool's output banner</h4>
+
+<p>The tools from TZWorks tools will output header information about the tool's version
+and whether it is running in <i>limited</i> or <i>full</i> mode.  This is directly related
+to what version of a license the tool authenticates with.   The <i>limited</i> keyword 
+indicates some functionality of the tool is not available, and the <i>full</i> keyword 
+indicates all the functionality is available.  The lacking functionality in the <i>limited</i>
+version may mean one or all of the following: (a) certain options may not be available, 
+(b) certain data may not be outputted in the parsed results, and (c) the license has a 
+finite lifetime before expiring.</p>
+
+</div>
+
+<hr/><!---------------------Version history---------------------->
+<h2><a name="version_history">Version history</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<ul type="square">  
+	<li>04/05/2014 - v0.64 - fixed bug with non-ASCII characters</li>
+	<li>01/16/2014 - v0.63 - auth update</li>
+    <li>11/18/2013 - v0.62 - tweaked authentication options for demo license</li>
+	<li>10/09/2013 - v0.61 - upgraded licensing routines</li>
+    <li>08/22/2013 - v0.60 - routine library maintenance updates</li>
+    <li>08/15/2013 - v0.59 - Fixed bug introduced in v0.58 on DOS time.</li>
+    <li>07/05/2013 - v0.58 - Updated the authentication routine and other fixes</li>
+    <li>11/03/2012 - v0.57 - maintenance update of core libraries w/ bug fixes </li>
+    <li>09/29/2012 - v0.56 - added hash check to ensure binary integrity.  Changed the
+    std input option to use the [-pipe] switch.</li>
+    <li>04/05/2012 - v0.55 - added license authentication.</li>
+    <li>03/17/2012 - v0.54 - fixed bug in when piping in files, w/o any options</li>
+    <li>12/31/2011 - v0.53 - changes/enhancements - The [-m | -v] options are now 
+    deprecated and <b>id</b> defaults to the -v option (for verbose).   
+    Secondly the [-slack] option is also deprecated and the default 
+    option and is to scan the entire file regardless of whether a 
+    directory entry exists in the index.dat table.  The file option
+    [-f] now allows one to pass in any file type.  Prior versions
+    only allows *.dat files to be scan.  This version allows any 
+    file type of any size to be scanned, even a dd image of a 
+    volume or drive.  These and other internal changes allow for
+    a more complete scan and highest percentage of record extraction. <br />                
+    Two new experimental options are added.  These are: 
+    (a) the ability to scan a live volume directly for index.dat records 
+    (b) the ability to scan a VMWare monolithic volume directly for index.dat 
+    records.<br />                 
+    Finally, the output formatting while still CSV, has more fields
+    that are displayed from the extracted results.</li>
+    <li>12/23/2011 - v0.52 - incorporates an option for handling locale for dates.
+    this option is invoked w/ the [-locale] switch.
+    Also added scanning and parsing of records in the slack 
+    space of the index.dat file. This option is invoked w/ the
+    [-slack] switch.</li>
+    <li>05/30/2011 - v0.51 - added 32 and 64 bit versions to the mix</li>
+    <li>02/26/2011 - v0.5  maintenance update</li>
+    <li>01/03/2011 - v0.4b fixed bug in parsing URL data when encountering 
+    username data.</li>
+    <li>12/21/2010 - v0.4a maintenance updates</li>
+    <li>11/23/2010 - v0.4 maintenance updates</li>
+    <li>08/10/2010 - v0.3 ported over to MAC OS-X 10.6</li>
+    <li>06/15/2010 - v0.2. modified cmdline (see readme above)</li>
+    <li>06/05/2010 - v0.1. initial prototype</li>
+</ul>
+</div>
+
+<hr/><!---------------------References---------------------->
+<h2><a name="references">References</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+<div>
+<pre>
+    [1] Wikipedia, the free encyclopedia.  Windows index.dat files topic.
+    [2] Forensic Analysis of Internet Explorer Activity Files, Keith Jones, 3/19/03
+    [3] Is Your index.dat File LEAKing, Mike Murr, 9/18/09
+    [4] SANS Computer Forensics Essentials [408 course], Rob Lee, 1/2010
+</pre>
+</div>
+
+<hr/><!---------------------Copyright---------------------->
+<h5 align="right">Copyright &copy; TZWorks, LLC, All Rights Reserved <br />
+Contact Info: <a href="mailto:info@tzworks.net">info&#64;tzworks.net</a></h5>
+
+<p></p>
+<hr />
+<p></p>
+</body>
+
+</html>
+

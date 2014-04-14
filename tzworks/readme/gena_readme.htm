@@ -1,0 +1,578 @@
+<html>
+
+<head>
+    <title>gena readme</title>
+    <style type="text/css">
+        div
+        {
+            margin-left: 1em;
+        }
+    </style>
+</head>
+
+<body bgcolor="white"">
+
+<h2 align="center"><a name="index">Graphical Engine for NTFS Analysis - <i>gena</i></a></h2>
+<h3 align="center">(version 0.18)<br /><br /></h3>
+<!--WARNING_TAG-->
+<hr />
+
+<ul>
+    <li> <a href="#eula"> End User's License Agreement (EULA) </a></li>
+
+    <li> <a href="#about"> About the <b><i>gena</i></b> Tool </a></li>
+    <li> <a href="#usage">Usage</a></li>
+    <li> <a href="#ntfswalk_tab"><b><i>ntfswalk</i></b> Dialog Tab</a></li>
+    <li> <a href="#mft_record_tab">MFT Record Metadata Tab</a></li>
+    <li> <a href="#volume_tab">Volume Tab</a></li>
+    <li> <a href="#wisp_tab"><b><i>wisp</i></b> Tab</a></li>
+    <li> <a href="#data_tab">Data Tabs</a></li>
+    <li> <a href="#scan_drives">Scanning Mounted Drives</a></li>
+    <li> <a href="#auth"> Authentication and License File </a></li>
+    <li> <a href="#version_history"> Version history </a></li>
+    <li> <a href="#references"> References </a></li>
+</ul>
+
+
+
+<hr/><!---------------------EULA---------------------->
+<h2><a name="eula">TZWorks Tools included in the SANS Investigative Forensic Toolkit (SIFT)</br>
+END USER LICENSE AGREEMENT (EULA)</a></h2>
+
+<h3>USER AGREEMENT</h3>
+<div>
+<p>Permission to use the TZWorks, LLC software and related documentation (&quot;Software&quot;) 
+is for <b>Demonstration and Testing use ONLY</b>. The User Agreement, Disclaimer, and/or Software 
+may change from time to time.  By continuing to use the Software after those changes become 
+effective, you agree to be bound by all such changes.  Permission to use the Software is granted 
+provided that (1) use of such Software is for <b>Demonstration and Testing use only</b> and 
+(2) the Software is not resold, transferred or distributed to any other person or entity.  
+<i><font color="red">To use the Software for commercial or business purposes, a separate 
+license is required.</font></i> Contact TZWorks, LLC 
+(<a href="mailto:info@tzworks.net">info&#64;tzworks.net</a>) 
+for more information regarding licensing. To redistribute the Software, approval in writing 
+is required from TZWorks, LLC.  These terms do not give the user any rights in intellectual 
+property or technology, but only a limited right to use the Software for <b>Demostrations and 
+Testing</b>.  TZWorks, LLC retains all rights to ownership of this Software.</p>
+</div>
+
+<h3>DISCLAIMER</h3>    
+<div>
+<p>The user agrees that this Software is experimental in nature and use of the Software is 
+at user's sole risk.  The Software could include technical inaccuracies or errors.  Changes 
+are periodically added to the information herein, and TZWorks, LLC may make improvements and/or 
+changes to Software at any time.  TZWorks, LLC makes no representations about the accuracy or 
+usability of the Software for any purpose.</p>
+
+<p>ALL SOFTWARE ARE PROVIDED &quot;AS IS&quot; AND &quot;WHERE IS&quot; WITHOUT WARRANTY 
+OF ANY KIND INCLUDING ALL IMPLIED WARRANTIES AND CONDITIONS OF MERCHANTABILITY, FITNESS 
+FOR ANY PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT.  IN NO EVENT SHALL TZWORKS, LLC 
+BE LIABLE FOR ANY KIND OF DAMAGE RESULTING FROM ANY CAUSE OR REASON, ARISING OUT OF IT 
+IN CONNECTION WITH THE USE OR PERFORMANCE OF INFORMATION AVAILABLE FROM THIS SOFTWARE. </p>
+</div>
+
+<h3>REMOVAL</h3>
+<div>
+<p>The Software are the original works of TZWorks, LLC.  However, to be in compliance with 
+the Digital Millennium Copyright Act of 1998 (&quot;DMCA&quot;) we agree to investigate and disable any 
+material for infringement of copyright. Contact TZWorks, LLC at email address: 
+<a href="mailto:info@tzworks.net">info&#64;tzworks.net</a>, regarding any DMCA concerns. </p>
+</div>
+
+<!-- 
+This is section is commented out, since it is only used by the tool binary
+
+USER_AGREEMENT_START
+-------------------------------- User Agreement -----------------------------
+
+Permission to use the TZWorks, LLC software and related documentation
+("Software") is for Demonstration and Testing use ONLY. The User Agreement, 
+Disclaimer, and/or Software may change from time to time.  By continuing to 
+use the Software after those changes become effective, you agree to be 
+bound by all such changes.  Permission to use the Software is granted 
+provided that (1) use of such Software is for Demonstration and Testing use 
+only and (2) the Software is not resold, transferred or distributed to any 
+other person or entity.  To use the Software for commercial or business 
+purposes, a separate license is required. Contact TZWorks, LLC 
+(info@tzworks.net) for more information regarding licensing. To redistribute
+the Software, approval in writing is required from TZWorks, LLC.  These 
+terms do not give the user any rights in intellectual property or technology,
+but only a limited right to use the Software for Demostrations and Testing.
+TZWorks, LLC retains all rights to ownership of this Software.
+USER_AGREEMENT_END
+
+DISCLAIMER_START
+---------------------------------- DISCLAIMER -------------------------------
+
+The user agrees that all Software made available by TZWorks, LLC is
+experimental in nature and use of the Software is at user's sole risk. The
+Software could include technical inaccuracies or errors.  Changes are 
+periodically added to the information herein, and TZWorks, LLC may make 
+improvements and/or changes to Software and/or related documentation at any
+time.  TZWorks, LLC makes no representations about the accuracy or usability
+of the Software for any purpose.  All software are provided "AS IS" and 
+"WHERE IS" without warranty of any kind including all implied warranties and
+conditions of merchantability, fitness for any particular purpose, title and
+non-infringement.  In no event shall TZWorks, LLC be liable for any kind of 
+damage resulting from any cause or reason, arising out of it in connection
+with the use or performance of information available from this Software.
+DISCLAIMER_END
+-->
+
+
+
+
+
+<hr/><!---------------------About the <b><i>gena</i></b> Tool---------------------->
+<h2><a name="about">About the <b><i>gena</i></b> Tool</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<p>The forensic community has been providing consistent feedback on the TZWorks 
+toolset in identifying which tools and capabilities are important to them.   
+This feedback is valuable and allows us at TZWorks to focus on areas useful 
+to the community and is one of the reasons we continue to develop new tools. 
+One item we hear repeatedly is a request to provide a GUI (Graphical User 
+Interface) front end to some of the TZWorks command line tools.  While we 
+internally prefer command line tools for automated processing, we do have a 
+handful of GUI based tools that we develop for internal use only, primarily 
+for reversing and analyzing new artifacts.   So we decided to take one of 
+our internal tools, take out some of the more arcane options, and merge the 
+backend processing with <b><i>ntfswalk</i></b> and some other tools to come 
+up with <b><i>gena</i></b>. </p> 
+
+<p>The name <b><i>gena</i></b> is short for Graphical Engine for NTFS 
+Analysis.  Along the way, we made some significant additions to 
+<b><i>ntfswalk</i></b>, as well, to allow <b><i>gena</i></b> to be used as 
+a flexible tool for data extraction.  We also incorporated some capabilities 
+from <b><i>ntfscopy</i></b> <b><i>ntfsdir</i></b>, and <b><i>wisp</i></b> 
+into <b><i>gena</i></b>. So while this document is a readme for 
+<b><i>gena</i></b>, there are references to some of these other 
+tools throughout.</p>
+
+<p>When developing a GUI app we have stuck with the FOX (Free Objects 
+for X) C++ toolkit, since it is cross platform, light weight, fast in 
+performance and compiles into a static library that is relatively small 
+when compared to the other GUI toolkits.  FOX, however, has some 
+drawbacks in that it may not have the look and feel that a normal 
+Windows application may have.  The GUI front end for <b><i>gena</i></b> 
+uses the FOX toolkit.</p>
+
+<p>Similar to the other TZWorks tools that were mentioned, <b><i>gena</i></b> 
+is designed to work with live (mounted) NTFS volumes.  There is also 
+functionality for traversing either NTFS images (a) created with the dd 
+utility or (b) from a monolithic volume consisting of VMWare VMDK files.  
+Whether <b><i>gena</i></b> is being used for live incident response 
+collection or to process an image in an off-line manner, there are options 
+to filter on file extensions, a timestamp range, various binary signatures, 
+partial filenames and directory contents. For targeted files found, one can 
+list the summary metadata, extract the header bytes of the file data, 
+or extract the entire file contents into a designated directory.  
+Since the GUI front end and backend parsing engine are both Windows 
+API agnostic, there are compiled versions for Windows, Linux and 
+Mac OS X.</p>
+
+<p>To use this tool, an authentication file is required to be in the same 
+directory as the binary for the tool to run.  The non-commercial/demonstrational-use 
+EULA is part of this readme. It only activates certain capabilities of the 
+tool and is meant only for demonstration purposes.  This authentication will 
+eventually expire.  To activate all the functionality of the tool and use 
+it on a permanent basis, a separate business license needs to be purchased. 
+Contact <a href="mailto:info@tzworks.net">info&#64;tzworks.net</a> for more 
+details about the using this tool for business and/or casework use.</p>
+</div>
+
+<hr/><!---------------------Usage---------------------->
+<h2><a name="usage">Usage</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+<div>
+<p>The <b><i>gena</i></b> GUI is divided into two main window panes.  The first 
+pane is on the left, and is a quasi-Windows Explorer view of the volume under 
+analysis.  The right pane is governed by a series of tabs that reflect differing 
+functionality.  The number of tabs is dependent on the MFT record (or inode) 
+that is selected on the left tree-view pane.   This is the area where one 
+can invoke the <b><i>ntfswalk</i></b> tool or peer into the details of an
+ MFT record.   The first and default tab is for the <b><i>ntfswalk</i></b> 
+ dialog.  It exposes various options unique to <b><i>ntfswalk</i></b>.</p>
+
+<p>When one loads a volume for analysis, a series of additional tabs 
+automatically become visible.  This includes: a tab for MFT record metadata 
+(timestamp, cluster runs, etc.), a tab for the hexadecimal dump of the file 
+record under analysis, and a separate tab for each NTFS attribute containing 
+data.  The term data defined here, can include: (a) the unnamed data stream, 
+(b) any alternate named data streams, (c) the directory's INDX data, 
+(d) a Logged Stream data, and (e) various others.   To keep things simple, 
+each unique data set is selectable with a separate data tab.</p>
+
+<p>Currently there are four types of source data <b><i>gena</i></b> can 
+analyze, including: (a) NTFS drive/volume stored as a ‘dd’ type image, 
+(b) NTFS mounted drive/volume, (c) an exported $MFT file, or (d) a 
+VMWare volume.  To analyze an image or mounted volume, one uses the 'File' 
+menu to selected the desired data source.</p>
+
+<h4>Format Options</h4>
+<p>There are a few data format options, grouped by the following 
+categories: (a) Final output, (b) Date Format, and (c) Time Resolution. </p>
+
+<p>The first category, final output, tells <b><i>gena</i></b> how to format 
+the results file <b><i>ntfswalk</i></b> produces.  This can either be: 
+(a) default output, (b) CSV format, (c) Log2Timeline format, (d) BodyFile 
+format or (e) a Hashfile.</p>
+
+<p>The default option uses one line to specify the attributes per inode 
+and uses the pipe character '|' as a separator.  The CSV option is similar 
+to the default option, but forces all output to be in comma separated value 
+format.  Thus, any data that had comma in its name are changed to space 
+character to protect the integrity for the CSV fields.</p>
+
+<p>The Log2Timeline option forces all output to be in CSV format and tries 
+to conform to the log2timeline format specified by the website 
+http://log2timeline.net/.  This output needs to be independently 
+verified for correctness.  </p>
+
+<p>The Bodyfile option outputs the data fields in accordance with the 
+body-file version3 specified in the Sleuthkit.   The date and timestamp 
+outputted to the body-file are in terms of UTC.   So if using the 
+body-file in conjunction with the mactime.pl utility, one needs to 
+set the environment variable TZ=UTC.  This output also needs to be 
+independently verified for correctness.</p>
+
+<p>The last option is the Hashfile format.  This option will generate 
+both a MD5 and SHA1 entry as well as other metadata per inode that 
+was processed.</p>
+
+<p>Note:  If extracting data (eg. files) during the run, the first two 
+options are the only options available.  If not extracting file content 
+data, then all five options are available. </p>
+
+<h4>Date/Time Format</h4>
+<p>The date format can be selected based on desired convention.  The Date 
+Format menu offers three common format options:  mm/dd/yyyy, dd/mm/yyyy 
+or yyyy/mm/dd.   The default is set to the USA convention of: mm/dd/yyyy.</p>
+
+<p>The time format has three resolution options:  (a) seconds, 
+(b) milliseconds and (c) microseconds.  The default is set to milliseconds. </p> 
+</div>
+
+<hr/><!---------------------<b><i>ntfswalk</i></b> dialog tab---------------------->
+<h2><a name="ntfswalk_tab"><b><i>ntfswalk</i></b> Dialog Tab</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<p><b><i>gena</i></b> was originally designed to be a front end to the 
+<b><i>ntfswalk</i></b> command line tool.  The additional capabilities added to 
+version 0.45 of <b><i>ntfswalk</i></b> coupled with <b><i>gena</i></b> make it easy 
+to target specific files in a scripted manner, whether for incident response or normal 
+forensic data collection.  <b><i>gena</i></b> puts many (but not all) of the available 
+<b><i>ntfswalk</i></b> command line options at easy access to the user and graphically 
+arranges them by functionality.   Therefore, this is the tab to use, if you want to 
+extract many files or analyze an entire volume.</p>
+
+<p>If using <b><i>gena</i></b> just to setup a script for <b><i>ntfswalk</i></b> to 
+run later on another target box, one can use <b><i>gena</i></b> to select the desired 
+options without loading an image, and select the 'Generate Script' button.  This 
+action will package all the options selected, generate a script that is 
+compatible to be invoked directly by <b><i>ntfswalk</i></b> (in a command line mode).  
+To handle this script, a new <i>-script</i> command line option has been added to 
+<b><i>ntfswalk</i></b>.  See the <b><i>ntfswalk</i></b> documentation for more details. </p>
+
+<p>On the other hand, if one wants to perform a data collection or volume analysis 
+on a live system (or off-line image), one can point <b><i>gena</i></b> at any NTFS 
+volume (or image) and it will operate on that target.   Selecting the 'Spawn <b><i>ntfswalk</i></b>' 
+button will do just that: spawn an instance of <b><i>ntfswalk</i></b> as a separate 
+process passing to it the options the user has selected.  <b><i>gena</i></b> and 
+<b><i>ntfswalk</i></b> really do not care whether the target volume is a live 
+mounted image or a ‘dd’ image.  They process them the same way.  As an aside, 
+since <b><i>gena</i></b> will spawn <b><i>ntfswalk</i></b>, both tools should be in the 
+same directory along with their authenticating licenses for this mode to work.  Using 
+this latter technique, <b><i>gena</i></b> can spawn as many instances of 
+<b><i>ntfswalk</i></b> that is desired while they run in parallel, assuming the host 
+machine can handle the processing and memory load.</p>
+
+<p>Since there is this close relationship between <b><i>gena</i></b> and <b><i>ntfswalk</i></b>, 
+only version 0.45 of <b><i>ntfswalk</i></b> and later work with <b><i>gena</i></b>.</p>
+
+<h4>Filter options w/ <b><i>ntfswalk</i></b></h4>
+
+<p>The filtering options are where one can hone exactly what type of files they are 
+interested in.   This turns out to be the primary way to speed up any target 
+collection.  To understand the filter options, some background on <b><i>ntfswalk</i></b>
+ is useful.  Version 0.45 of <b><i>ntfswalk</i></b> has been enhanced in a number of 
+ ways from the prior versions.  While still evolving, filtering is one of the bigger 
+ enhancements and was geared to help out in incident response collection.</p>
+
+<p>The filtering architecture has been beefed up to allow for more combinations 
+of options, some of which use OR logic and others which use AND logic.  Consequently, 
+as the number of command line options increased, the complexity (and confusion 
+factor) increased as well.  Fortunately, the <b><i>ntfswalk</i></b> dialog tab in 
+<b><i>gena</i></b> keeps the OR and the AND logic straight between the various options 
+by the various grouping of options. </p>
+
+<p>One can filter on any number of extensions, partial names, directories, and 
+signatures.  This means they will all use OR logic, which translates to, if any 
+of the inode's passes any one filter mentioned above it will go to the next step.  
+The AND logic comes into play when looking at (a) filtering by date range and 
+(b) filtering on deleted files.  Once an inode passes the filtering tests, it 
+then proceeds to be outputted to the results file, and if, instructed, copied 
+to the specified directory. </p>
+
+<h4>Filtering on NTFS File Record data (external data)</h4>
+
+<p>The most basic (and fastest) filtering one can perform is by filtering on 
+the NTFS file record (or external) metadata.  This includes things as: (a) file
+name, (b) file extension, (c) time stamp, (d) parent directory, (e) or 
+inode.  The other mode of filtering is on internal, file content data.  This 
+mode of filtering is discussed in the next section.  </p>
+
+<h4>Filter on file content data (internal data)</h4>
+
+<p>The more thorough (and slower) filtering one can perform is by filtering on 
+the file content data.  The <b><i>ntfswalk</i></b> engine will use predeterministic 
+signature analysis to determine whether a file meets one of the available 
+categories.  Only a few common ones were added to <b><i>gena</i></b>.  These 
+include: (a) LNK files, (b) Event logs, (c) Registry hives, (d) SQLite3 
+databases, and (e) executable and library files.  </p>
+
+<h4>Selecting what clusters to scan and whether we are just interested in 
+deleted records</h4>
+
+<p>This category of options is broken up into four use-cases.  The first 
+set is whether one just wishes to scan (a) all records in the $MFT data or 
+(b) just the deleted records in the $MFT data.  The second set is whether 
+one wants to scan (c) all the clusters of a volume or (d) just the 
+deleted clusters of a volume.  A fast option is to only scan the $MFT 
+data (eg. data in inode 0), while the more complete option is to scan 
+'All clusters/All records'.   The default option is the former (all 
+records in the $MFT data section).</p>
+
+<h4>Selecting Files in a Time Range</h4>
+
+<p>One can select a date range.  If at least one date (of the 4 MACB standard
+information dates) for an inode is within this range, it will pass the test 
+and be processed. Note all dates need to be expressed in UTC format and the 
+date string needs to conform to: mm/dd/yyyy hh:mm:ss.</p>
+
+<h4>Miscellaneous Results file options</h4>
+
+<p>Each run will produce a results file.   In addition to the normal data 
+that is provided, other data can be inserted as well.  In addition to 
+changing the default hexadecimal output to base10 discussed previously, 
+one can record the volume offset of the file record as well as record the 
+cluster run.  </p>
+
+<h4>Extraction Options</h4>
+
+<p>If desiring to extract files to an archive directory, one can select the 
+'Copy Target Files' checkbox.  If one is worried about copying malicious data 
+from a target box one can change the extension of the file extracted by 
+appending a *.bin to the file, so it is not accidently run should the file 
+contain some malicious executable content.  To do this select the 'Append
+.bin as extension' checkbox.</p>
+
+<p> Other options include copying the file as 'raw' which means copy the file 
+as the cluster data is represented and don't translate the data (this applies to the files that 
+use the native NTFS compression).  Also the 'raw' option will copy all allocated 
+clusters associated with the file and not just the 'used' clusters.  Therefore 
+the 'raw' option will yield the slack that is available.   The last option 
+is whether one wishes to include any sparse clusters as part of the file copy.  
+The sparse clusters while present on some files, are not backed by physical 
+clusters and therefore <b><i>ntfswalk</i></b> will copy zeros in place of these 
+sparse clusters, if this option is selected.</p>
+
+<p>The extraction directory for both the results file and any files extracted 
+is specified by the text entry box "Results Directory".  The default directory is 
+'GENA_Results' under the current working directory.  Whatever directory is inputted 
+here will be used as the parent directory for archiving data.  <b><i>ntfswalk</i></b>
+will create subdirectories under this parent directory to categorizes different 
+runs as well as categorize data within a run.</p>
+
+<h4>Extracted Files Naming convention</h4>
+
+<p>If you selected files to be extracted, then for each file extracted, the file name 
+will consist of 3 items: (a) first the timestamp of the last modify time, 
+(b) the computed MD5 hash of the file and (c) the original filename. </p>
+</div>
+
+<hr/><!---------------------MFT Record Metadata Tab---------------------->
+<h2><a name="mft_record_tab">MFT Record Metadata Tab</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<p>The metadata in this tab includes an 'interpreted' version of the NTFS file 
+record.  What this means, is if <b><i>gena</i></b> sees a standard information 
+attribute, it shows the properties and timestamps associated with this sort of 
+NTFS attribute.  Likewise, if <b><i>gena</i></b> sees a filename attribute, it 
+shows the name, parent inode and timestamps associated with this attribute.  
+For data attributes, <b><i>gena</i></b> shows the size data (allocated vice file 
+size) as well as any cluster runs that house the data.  For other attributes 
+where parsing is not done, but data is available, <b><i>gena</i></b> will show 
+these attributes in a separate tab.  </p>
+</div>
+
+<hr/><!---------------------Volume Tab---------------------->
+<h2><a name="volume_tab">Volume Tab</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<p>This tab shows a hexadecimal view of the volume under analysis.  When synced 
+with the selected inode from the directory tree, it will display the raw file 
+record data</p>
+
+<p>With this tab, one has the freedom to look at any volume offset that is 
+desired.  To do this, just select the 'Manually inputted' radio button and 
+the offset field will be activated as well as the display button. One has 
+the option of traversing the volume either by volume offset address or by 
+volume logical cluster number.</p>
+</div>
+
+<hr/><!---------------------<b><i>wisp</i></b> Tab---------------------->
+<h2><a name="wisp_tab"><b><i>wisp</i></b> Tab</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<p>When selecting any directory from the tree view, a <b><i>wisp</i></b> 
+(Windows INDX Slack Parser) tab is displayed.  Since <b><i>gena</i></b> can 
+parse the INDX attribute to find the children to a directory, we incorporated 
+a lite version of the TZWorks <b><i>wisp</i></b> engine.  This will allow 
+<b><i>gena</i></b> not only to parse normal children but also slack entries 
+(or children that have been deleted).   This is very useful in identifying 
+deleted files after they have been wiped from the NTFS volume, since the file 
+artifact could still be in the parent directory's INDX attribute. </p>
+
+<p>Each entry will have a name, file size, and a set of timestamps.  For 
+additional verification, we added the ability for each entry to show the 
+source data (or hex dump of the data that was parsed), complete with actual 
+offset of where the data resides in the INDX cluster run.</p>
+</div>
+
+<hr/><!---------------------Data Tabs---------------------->
+<h2><a name="data_tab">Data Tabs</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<p><b><i>gena</i></b> is very useful for displaying file data.  Not only does it show the 
+normal data (unnamed data stream) and the alternate (named) data stream, 
+but it also shows the Bitmap data, Logged Stream data, and various types 
+of INDX data.  A good example is looking at the $Secure inode (#9).  
+It has a number of attributes that contain data.  Without going into 
+too much detail, it contains: (a) an $SDS alternate data stream, 
+(b) $SII index root and allocation attributes, (c) $SII bitmap 
+attribute, (d) $SDH index root and allocation attributes, and 
+(d) an $SDH bitmap attribute.</p>
+
+<p> While some of the attributes might only have a little bit of data or 
+the data may reside as resident data within the file record itself, <b><i>gena</i></b> 
+will display a separate tab for each data category. </p>
+
+<p>Within each of these data tabs, are options to go to a specific offset, 
+find a string or pattern or export the data to a separate file to analyze 
+with another forensics tool.  In some cases it may be useful to represent 
+the data as ASCII or Unicode instead of hexadecimal, so those options are 
+there as well.</p>
+</div>
+
+<hr/><!---------------------Scanning Mounted Drives---------------------->
+<h2><a name="scan_drives">Scanning Mounted Drives</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+<div>
+<p>The Utilities menu was meant to be a catch-all location for helpful utilities.   
+In this case, there was only one we had time to add to this and it includes the 
+option to scan the mounted drives on a live system.  </p>
+
+<p>When run, it will enumerate all the drives on a system and return a dialog 
+box with the showing the drive, drive#, drive size, disk signature, partition 
+information (offset, size and type), etc.  This is helpful when using 
+<b><i>gena</i></b> to analyze a drive or image of a drive with multiple 
+partitions and one wishes to find the volume offset.</p>
+</div>
+
+    
+<hr/><!---------------------Authentication and License File---------------------->
+<h2><a name="auth">Authentication and License File</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<p>This tool has authentication built into the binary.  There are two authentication 
+mechanisms:  
+(a) the digital certificate embedded into the binary and (b) the runtime authentication.   
+For the first method, only the Windows and Mac OS-X (if available) versions have been 
+signed by an X-509 digital code signing certificate, which is validated by Windows 
+(or OS-X) during operation.  If the binary has been tampered with, the digital 
+certificate will be invalidated.</p>
+
+<p>For the second (runtime authentication) method, the authentication does two things: 
+(a) validates that the tool has a valid license and (b) validates the 
+tool's binary has not been corrupted.   The license needs to be in the same directory 
+of the tool for it to authenticate.   Furthermore any modification to the license, 
+either to its name or contents, will invalidate the license.   The runtime binary 
+validation hashes the executable that is running and fails the authentication if it 
+detects any modifications. </p>
+
+<h4><i>Limited</i> vice <i>Full</i> in the tool's output banner</h4>
+
+<p>The tools from TZWorks tools will output header information about the tool's version
+and whether it is running in <i>limited</i> or <i>full</i> mode.  This is directly related
+to what version of a license the tool authenticates with.   The <i>limited</i> keyword 
+indicates some functionality of the tool is not available, and the <i>full</i> keyword 
+indicates all the functionality is available.  The lacking functionality in the <i>limited</i>
+version may mean one or all of the following: (a) certain options may not be available, 
+(b) certain data may not be outputted in the parsed results, and (c) the license has a 
+finite lifetime before expiring.</p>
+
+</div>
+
+
+<hr/><!---------------------Version history---------------------->
+<h2><a name="version_history">Version history</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+<div>
+<ul type="square">
+	<li>04/05/2014 - v0.18 - pulls additional slack entries out when entries are corrupted. fixed
+                            boundary condition with mounted certain VMWare disks</li>
+	<li>01/16/2014 - v0.17 - added 'edb' type filter extension as part of the 'system files' 
+							option.</li>
+    <li>11/18/2013 - v0.16 - added 'evtx' and 'evt' type filter extension as part of the 
+                            'system files' option</li>
+    <li>10/26/2013 - v0.15 - fixed bug in tab creation for certain data types as well
+							as listing more complete metadata in NTFS file record.</li>
+    <li>10/22/2014 - v0.14 - fixed bug in dialog for image mount. fixed bug in processing
+							exported $MFT file. </li>
+    <li>10/09/2013 - v0.13 - fixed bug in output for MFT entries with multiple parents. 
+							fixed bug in output of sparse cluster metadata. fixed other
+                            misc bugs in GUI.</li>
+    <li>08/22/2013 - v0.12 - fixed bug to handle invalid file type.  Updated drag-n-drop 
+							for Windows. (note: for this version of <b><i>gena</i></b>, Linux 
+							and OS-X does not have drag-n-drop).</li>
+    <li>07/08/2013 - v0.11 - Demo version of <b><i>gena</i></b> packaged with 
+							<b><i>ntfswalk</i></b> v0.45</li>
+    <li>07/05/2013 - v0.10 - 1st version released</li>
+</ul>
+</div>
+
+<hr/><!---------------------References---------------------->
+<h2><a name="references">References</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+<div>
+<ol>    
+    <li><a href="http://www.fox-toolkit.org/">FOX-toolkit</a> version 1.6.47.</li>
+    <li><a href="https://tzworks.net/prototype_page.php?proto_id=12">ntfswalk</a> </li>
+    <li><a href="https://tzworks.net/prototype_page.php?proto_id=8">ntfsdir</a> </li>
+    <li><a href="https://tzworks.net/prototype_page.php?proto_id=9">ntfscopy</a> </li>
+    <li><a href="https://tzworks.net/prototype_page.php?proto_id=21">wisp</a> </li>
+    <li><a href="http://www.ntfs.com/">http://www.ntfs.com</a> website</li>
+    <li><a href="http://www.linux-ntfs.org/doku.php">http://www.linux-ntfs.org</a> website</li>
+    <li>Brian Carrier's book, File System Forensic Analysis, sections on NTFS</li>
+    <li>Various Microsoft Technet articles</li>
+</ol>
+</div>
+
+<hr/><!---------------------Copyright---------------------->
+<h5 align="right">Copyright &copy; TZWorks, LLC, All Rights Reserved <br />
+Contact Info: <a href="mailto:info@tzworks.net">info&#64;tzworks.net</a></h5>
+
+<p></p>
+<hr />
+<p></p>
+</body>
+
+</html>

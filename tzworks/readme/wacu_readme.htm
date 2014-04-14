@@ -1,0 +1,529 @@
+<html>
+
+<head>
+    <title>wacu (Windows AppCompatibility Cache Utility) readme</title>
+    <style type="text/css">
+        div
+        {
+            margin-left: 1em;
+        }
+    </style>
+</head>
+
+<body bgcolor="white"">
+
+<h2 align="center"><a name="index">Windows AppCompatibility Cache Utility - <i>wacu</i></a></h2>
+<h3 align="center">(version 0.13)<br /><br /></h3>
+<!--WARNING_TAG-->
+<hr />
+
+<ul>
+    <li> <a href="#eula"> End User's License Agreement (EULA) </a></li>
+
+    <li> <a href="#about"> About the <b><i>wacu</i></b> Tool </a></li>
+    <li> <a href="#howto"> How to use <b><i>wacu</i></b></a></li>
+	<li> <a href="#output">Understanding the output</a></li>
+	<li> <a href="#options">List of options</a></li>
+    <li> <a href="#auth"> Authentication and License File </a></li>
+    <li> <a href="#version_history"> Version history </a></li>
+    <li> <a href="#references"> References </a></li>
+</ul>
+
+
+
+<hr/><!---------------------EULA---------------------->
+<h2><a name="eula">TZWorks Tools included in the SANS Investigative Forensic Toolkit (SIFT)</br>
+END USER LICENSE AGREEMENT (EULA)</a></h2>
+
+<h3>USER AGREEMENT</h3>
+<div>
+<p>Permission to use the TZWorks, LLC software and related documentation (&quot;Software&quot;) 
+is for <b>Demonstration and Testing use ONLY</b>. The User Agreement, Disclaimer, and/or Software 
+may change from time to time.  By continuing to use the Software after those changes become 
+effective, you agree to be bound by all such changes.  Permission to use the Software is granted 
+provided that (1) use of such Software is for <b>Demonstration and Testing use only</b> and 
+(2) the Software is not resold, transferred or distributed to any other person or entity.  
+<i><font color="red">To use the Software for commercial or business purposes, a separate 
+license is required.</font></i> Contact TZWorks, LLC 
+(<a href="mailto:info@tzworks.net">info&#64;tzworks.net</a>) 
+for more information regarding licensing. To redistribute the Software, approval in writing 
+is required from TZWorks, LLC.  These terms do not give the user any rights in intellectual 
+property or technology, but only a limited right to use the Software for <b>Demostrations and 
+Testing</b>.  TZWorks, LLC retains all rights to ownership of this Software.</p>
+</div>
+
+<h3>DISCLAIMER</h3>    
+<div>
+<p>The user agrees that this Software is experimental in nature and use of the Software is 
+at user's sole risk.  The Software could include technical inaccuracies or errors.  Changes 
+are periodically added to the information herein, and TZWorks, LLC may make improvements and/or 
+changes to Software at any time.  TZWorks, LLC makes no representations about the accuracy or 
+usability of the Software for any purpose.</p>
+
+<p>ALL SOFTWARE ARE PROVIDED &quot;AS IS&quot; AND &quot;WHERE IS&quot; WITHOUT WARRANTY 
+OF ANY KIND INCLUDING ALL IMPLIED WARRANTIES AND CONDITIONS OF MERCHANTABILITY, FITNESS 
+FOR ANY PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT.  IN NO EVENT SHALL TZWORKS, LLC 
+BE LIABLE FOR ANY KIND OF DAMAGE RESULTING FROM ANY CAUSE OR REASON, ARISING OUT OF IT 
+IN CONNECTION WITH THE USE OR PERFORMANCE OF INFORMATION AVAILABLE FROM THIS SOFTWARE. </p>
+</div>
+
+<h3>REMOVAL</h3>
+<div>
+<p>The Software are the original works of TZWorks, LLC.  However, to be in compliance with 
+the Digital Millennium Copyright Act of 1998 (&quot;DMCA&quot;) we agree to investigate and disable any 
+material for infringement of copyright. Contact TZWorks, LLC at email address: 
+<a href="mailto:info@tzworks.net">info&#64;tzworks.net</a>, regarding any DMCA concerns. </p>
+</div>
+
+<!-- 
+This is section is commented out, since it is only used by the tool binary
+
+USER_AGREEMENT_START
+-------------------------------- User Agreement -----------------------------
+
+Permission to use the TZWorks, LLC software and related documentation
+("Software") is for Demonstration and Testing use ONLY. The User Agreement, 
+Disclaimer, and/or Software may change from time to time.  By continuing to 
+use the Software after those changes become effective, you agree to be 
+bound by all such changes.  Permission to use the Software is granted 
+provided that (1) use of such Software is for Demonstration and Testing use 
+only and (2) the Software is not resold, transferred or distributed to any 
+other person or entity.  To use the Software for commercial or business 
+purposes, a separate license is required. Contact TZWorks, LLC 
+(info@tzworks.net) for more information regarding licensing. To redistribute
+the Software, approval in writing is required from TZWorks, LLC.  These 
+terms do not give the user any rights in intellectual property or technology,
+but only a limited right to use the Software for Demostrations and Testing.
+TZWorks, LLC retains all rights to ownership of this Software.
+USER_AGREEMENT_END
+
+DISCLAIMER_START
+---------------------------------- DISCLAIMER -------------------------------
+
+The user agrees that all Software made available by TZWorks, LLC is
+experimental in nature and use of the Software is at user's sole risk. The
+Software could include technical inaccuracies or errors.  Changes are 
+periodically added to the information herein, and TZWorks, LLC may make 
+improvements and/or changes to Software and/or related documentation at any
+time.  TZWorks, LLC makes no representations about the accuracy or usability
+of the Software for any purpose.  All software are provided "AS IS" and 
+"WHERE IS" without warranty of any kind including all implied warranties and
+conditions of merchantability, fitness for any particular purpose, title and
+non-infringement.  In no event shall TZWorks, LLC be liable for any kind of 
+damage resulting from any cause or reason, arising out of it in connection
+with the use or performance of information available from this Software.
+DISCLAIMER_END
+-->
+
+
+
+
+<hr/><!---------------------About the <i>wacu</i> Tool---------------------->
+<h2><a name="about">About the <i>wacu</i> Tool</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<p><b><i>wacu</i></b> is a command line tool that targets the Windows system 
+registry hive <i>AppCompatibility Cache</i> subkey.  It was designed to: 
+(a) extract this type of data from the registry and archive the binary data 
+to a file for later analysis and (b) parse the target data from various 
+sources (live or exported system hive, image of the system volume or from 
+a file containing solely the binary data). </p>
+
+
+<p>As background, the <i>Application Compatibility Cache</i> is used by 
+the Windows operating system to help identify application compatibility 
+issues with the goal of trying to resolve them, so legacy applications 
+can run on the newer version of the operating system.  A search through
+the registry will show this data is spread across a number of hives, 
+including the user, system and software hives.   The Windows operating 
+system looks at the combination of data collected, and/or set by the user, 
+to determine which applications require shims to be used for compatibility 
+purposes.</p>
+
+
+<p>For the case of <b><i>wacu</i></b>, only data from the <i>system</i> 
+hive is analyzed.  Specifically, <b><i>wacu</i></b> looks to one of the 
+following registry subkeys identified below, depending on the version of 
+the operating system:</p>
+<pre>
+	.. for WinXP ..
+	HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\AppCompatibility\AppCompatCache
+
+	.. for versions above WinXP ..
+	HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\AppCompatCache\AppCompatCache
+</pre>
+
+<p>From a forensics standpoint, the data in the above subkeys gives the investigator
+insight into which applications were executed on the system.  One should note, however,
+that the presence of a filename in this data does not necessarily mean that the file
+was executed.  With this caveat, the data can be useful in tracking the initial 
+infection vector of malware.  This is because, if a user mode application was run 
+on the system, the chances are good it was recorded in this cache data. 
+For those user mode executables recorded, one gets the modification file time for 
+the target binary along with other miscellaneous data.  </p>
+
+<p>To use this tool, an authentication file is required to be in the same 
+directory as the binary for the tool to run.  The non-commercial/demonstrational-use 
+EULA is part of this readme. It only activates certain capabilities of the 
+tool and is meant only for demonstration purposes.  This authentication will 
+eventually expire.  To activate all the functionality of the tool and use 
+it on a permanent basis, a separate business license needs to be purchased. 
+Contact <a href="mailto:info@tzworks.net">info&#64;tzworks.net</a> for more 
+details about the using this tool for business and/or casework use.</p>
+
+</div>
+
+<hr/><!---------------------How to use wacu---------------------->
+<h2><a name="howto">How to use <i>wacu</i></a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+
+<p>Since <b><i>wacu</i></b> is a command line tool, one will need to open the command
+prompt.  If trying to target a live registry hive, one needs to be running with 
+admin privileges.</p>
+
+<p>Below is the menu with the various options.  Details of each option can be found 
+<a href="#options">here</a>.</p>
+
+<pre>
+   wacu - full ver: 0.13; Copyright (c) TZWorks LLC
+   
+   Usage:
+    (note: options with ** are enabled with a commercial license)
+   
+     wacu -livesys                              = parse from live target
+     wacu -hive &lt;system hive&gt;                   = parse from specified hive
+     wacu -binary &lt;app compat file&gt;             = ** parse raw data [16 MB max]
+     wacu -extract &lt;syshive&gt; -out &lt;file&gt;        = ** extract data into file
+     wacu -image &lt;file&gt; [-offset &lt;vol offset&gt;]  = ** use image as source
+     wacu -vmdk "file1 | file2 | .."            = ** use VMWare VMDK vol
+   
+    Basic options
+     -csv                   = output in comma separated value format
+     -csvl2t                = log2timeline output [needs validation]
+     -bodyfile              = sleuthkit output [needs validation]
+     -base10                = output number in base10 vice hex output
+     -hostname &lt;name&gt;       = output will contain this hostname
+   
+    Additional options
+     -dateformat yyyy/mm/dd = ** "mm/dd/yyyy" is the default
+     -timeformat hh:mm:ss   = ** "hh:mm:ss.xxx" is the default
+     -no_whitespace         = ** remove whitespace between csv delimiter
+     -csv_separator "|"     = ** use a pipe char for csv separator
+     -pipe                  = ** pipe hives into wacu for processing
+     -inc_slack             = ** process any slack space (win8 only)
+     -sort_by_name          = ** sort by path/file
+</pre>
+
+<h4>Targeting a live system</h4>
+<p>When targeting a live system one only need use the 
+<font color="red"><i><b>-livesys</b></i></font> switch and run
+with administrative privileges. Below is an example:</p>
+<pre>
+	<font color="red"><i><b>wacu -livesys &gt; results.txt</b></i></font>
+</pre>
+
+<p>The above command will generate a file with a listing of entries recorded
+in the shim cache.</p>
+
+<h4>Targeting an Exported Hive</h4>
+<p>By using the <font color="red"><i><b>-hive</b></i></font> switch and passing in
+the desired system hive, one can analyzed an exported hive.  In this mode, no
+special permissions are needed as long as read access is available to read the exported
+hive.  Below is an example of the syntax:</p>
+
+<pre>
+	<font color="red"><i><b>wacu -hive &lt;system hive name&gt; &gt; results.txt</b></i></font>
+</pre>
+
+<h4>Targeting a 'dd' Image of an NTFS Volume or Disk</h4>
+<p>When processing a system hive from a system volume or disk containing a system volume, one
+needs to specify the offset of the volume as part of the command.  In those cases, where a
+'dd' image was just of the system volume and not of the entire drive, the offset is zero.
+Below is an example of targeting a 'dd' image of the disk:</p>
+<pre>
+	<font color="red"><i><b>wacu -image &lt;name of image&gt; -offset &lt;system volume offset from start of disk&gt; &gt; results.txt</b></i></font>
+</pre>
+
+<h4>Targeting a VMWare drive with an NTFS system volume.</h4>
+<p>When processing a system hive from a VMWare monolithic NTFS formatted volume, one needs
+to consider what snapshot should be analyzed.  The syntax shown below allows for 
+several VMDK disks to be specified that make up one snapshot.  Below is an example
+of how to chain 3 VMDK files together:</p>
+<pre>
+	<font color="red"><i><b>wacu -vmdk "&lt;disk1&gt; | &lt;disk2&gt; | &lt;disk3&gt;" &gt; results.txt</b></i></font>
+</pre>
+
+
+<h4>Other Switches</h4>
+<p>The above examples are the main ones on how to parse an exported hive, mounted volume containing a hive or 
+an image containing a hive.  There are various other switches that can be used to specify different 
+formatting options.  Those are outlined in a follow-on <a href="#options">section</a>.</p>
+</div>
+
+<hr/><!---------------------Understanding the output---------------------->
+<h2><a name="output">Understanding the output</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<p>There are two main forms of output, both of which use one line per entry 
+parsed.  The default output is formatted text, where the fields are 
+nicely space with a pipe delimiter between fields.  This is useful when trying 
+to view the output with just a <i>notepad</i> type application.  The second output is 
+the standard comma separated value (CSV) output, and it is invoked via the 
+<font color="red"><i><b>-csv</b></i></font> switch.</p>
+
+<p>One caveat with the CSV option, is since the field separators are commas, 
+there is the possibility that filenames may have a comma(s) as part of their 
+name.  If this happens, than the field separators will be misaligned for that 
+entry.  Therefore, to maintain alignment of the data, <i><b>wacu</b></i> will 
+internally replace any commas in the name to spaces. This behavior is only 
+done if commas are used as the field delimiter.  If this is a concern, one 
+is recommended to change the default comma delimiter (in the 
+<font color="red"><i><b>-csv</b></i></font> option) to a pipe '|' delimiter, 
+via the <font color="red"><i><b>-csv_separator "|" </b></i></font> option.</p>
+
+<p>The other thing to understand about the output is it varies depending on 
+the version of the operating system the hive came from.  This is because 
+certain artifacts available in one version of Windows may or may not be 
+available in another version of Windows, as it relates to <i>AppCompatibility 
+Cache</i> artifacts.  Therefore, the output generated will be a function 
+of what version of Windows did the system hive originated from.  Furthermore, 
+some of the pieces of the data parsed is not fully understood (<i>as far as 
+what is the meaning of the data</i>)  by the forensics community at large.  
+For these cases, the raw data will be shown along with a '<i>best guess</i>' 
+of the interpretation of the data.  This <i>guess</i> is based on empirical 
+results, and as more samples are observed over time, the better the refinement 
+of the interpretation.  Finally, to ensure clarity, this data will be identified 
+as "<i>experimental</i>" in the column header.</p>
+
+<hr/><!---------------------List of options---------------------->
+<h2><a name="options">List of options</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<table border="1" cellpadding="2" cellspacing="0">
+    <tr bgcolor="yellow">
+        <th>Option</th>
+        <th>Extra</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+		<td>-livesys</td>
+		<td></td>
+		<td>Targets the active system hive of the running computer.  Requires administrative
+		privileges.</td>
+    </tr>
+     <tr>
+		<td>-hive</td>
+		<td></td>
+		<td>Use this specified target hive to process artifacts from. Syntax is
+		<font color="red"><i><b>-hive &lt;hive file&gt;</b></i></font></td>
+    </tr>
+   <tr>
+		<td>-binary</td>
+		<td>**</td>
+		<td>Parse the application cache raw data from a file.  This assumes one has
+		extracted just the data portion of the application cache from the appropriate
+		registry value and saved it to a file. One can use the <i>-extract</i> option
+		to do this.
+		Syntax is <font color="red"><i><b>-binary &lt;app compat file&gt;</b></i></font></td>
+    </tr>
+    <tr>
+        <td>-extract</td>
+        <td>**</td>
+        <td>Extract just the application cache data from the system hive and save the
+		binary data to a file.
+		Syntax is <font color="red"><i><b>-extract &lt;system hive&gt; -out  &lt;file to save data&gt;</b></i></font></td>
+    </tr>
+    <tr>
+        <td>-image</td>
+        <td>**</td>
+        <td>Extract application compatibility cache artifacts from a volume specified by an image and volume 
+		offset. The image is assumed to be in 'dd' (bit-for-bit identical) format to the original volume. The
+		offset specified, should be the volume containing the Windows directory.
+		The syntax is <font color="red"><i><b>-image &lt;filename&gt; -offset &lt;volume offset&gt;</b></i></font></td>
+    </tr>
+    <tr>
+        <td>-vmdk</td>
+        <td>**</td>
+        <td> Extract artifacts from a VMWare monolithic NTFS formatted volume. The syntax is 
+        <font color="red"><i><b>-vmdk &lt;disk name&gt;</b></i></font>.  For a collection
+        of VMWare disks that include snapshots, one can use the following syntax: 
+         <font color="red"><i><b>-vmdk "&lt;disk1&gt; | &lt;disk2&gt; | ..."</b></i></font></td>
+    </tr>
+	<tr>
+        <td>-csv</td>
+        <td></td>
+        <td>Outputs the data fields delimited by commas. Since filenames can have commas, to ensure 
+        the fields are uniquely separated, any commas in the filenames get converted to spaces.</td>
+    </tr>    
+    <tr>
+        <td>-csvl2t</td>
+        <td></td>
+        <td>Outputs the data fields in accordance with the log2timeline format.</td>
+    </tr>
+    <tr>
+        <td>-bodyfile</td>
+        <td></td>
+        <td>Outputs the data fields in accordance with the 'body-file' version3 specified in 
+        the SleuthKit. The date/timestamp outputted to the body-file are in terms of UTC.  
+        So if using the body-file in conjunction with the mactime.pl utility, one needs to set 
+        the environment variable TZ=UTC.</td>
+    </tr>
+	<tr>
+        <td>-base10</td>
+        <td></td>
+        <td>Ensure all size/address output is displayed in base-10 format vice hexadecimal format. Default
+        is hexadecimal format.</td>
+    </tr>
+	<tr>
+        <td>-hostname</td>
+        <td></td>
+        <td>Option is used to populate the output records with a specified hostname. The syntax
+		is <font color="red"><i><b>-hostname &lt;name to use&gt;</b></i></font>. </td>
+    </tr>
+
+    <tr>
+        <td>-inc_slack</td>
+        <td>**</td>
+        <td>Experimental option.  If there is any slack in the application cache value in the
+		registry, it will try to parse that data as well.  Currently only works with Windows 8.</td>
+    </tr>				     
+    <tr>
+        <td>-sort_by_name</td>
+        <td></td>
+        <td>Sorts the entries outputted by name vice sequence found in the data.</td>
+    </tr>
+    <tr>
+        <td>-pipe</td>
+        <td>**</td>
+        <td>Used to pipe system hives into the tool via STDIN (standard input).  Each system
+		hive passed in is parsed in sequence.</td>
+    </tr>
+    <tr>
+        <td>-no_whitespace</td>
+        <td>**</td>
+        <td>Used in conjunction with <font color="red"><i><b>-csv</b></i></font> option 
+        to remove any whitespace between the field  value and the CSV separator.</td>
+    </tr>
+    <tr>
+        <td>-csv_separator</td>
+        <td>**</td>
+        <td>Used in conjunction with the <font color="red"><i><b>-csv</b></i></font> 
+        option to change the CSV separator from the default comma to something else.
+        Syntax is <font color="red"><i><b>-csv_separator "|"</b></i></font> to change
+        the CSV separator to the pipe character.</td>
+    </tr>
+    <tr>
+        <td>-dateformat</td>
+        <td>**</td>
+        <td>Output the date using the specified format. Default behavior is 
+        <font color="red"><i><b>-dateformat "mm/dd/yyyy"</b></i></font>.
+        This allows more flexibility to for a desired format.  For example, one 
+        can use this to show year first, via 
+        <font color="red"><i><b>"yyyy/mm/dd"</b></i></font> or day first, 
+        via <font color="red"><i><b>"dd/mm/yyyy"</b></i></font>, or only show 2 
+        digit years, via the <font color="red"><i><b>"mm/dd/yy"</b></i></font>. The 
+        restriction with this option is the forward slash (/) symbol needs to separate 
+        month, day and year and the month is in digit (1-12) form vice abbreviated 
+        name form. </td>
+    </tr>
+    <tr>
+        <td>-timeformat</td>
+        <td>**</td>
+        <td>Output the time using the specified format. Default behavior is 
+        <font color="red"><i><b>-timeformat "hh:mm:ss.xxx"</b></i></font>
+        One can adjust the format to microseconds, via 
+        <font color="red"><i><b>"hh:mm:ss.xxxxxx"</b></i></font> or nanoseconds, 
+        via <font color="red"><i><b>"hh:mm:ss.xxxxxxxxx"</b></i></font>, or no fractional seconds, via 
+        <font color="red"><i><b>"hh:mm:ss"</b></i></font>. The 
+        restrictions with this option is a the colon (:) symbol needs to separate hours, minutes 
+        and seconds, a period (.) symbol needs to separate the seconds and fractional seconds, and the 
+        repeating symbol 'x' to represent number of fractional seconds. (note: the the fractional 
+        seconds applies only to those time formats that have the appropriate precision available. 
+        The Windows internal filetime has, for example, 100 nsec unit precision available. 
+        The DOS time format and the UNIX 'time_t' format, however, have no fractional seconds). 
+        Some of the times represented by for this tool may use a time format without fractional 
+        seconds and therefore will not show a greater precision beyond seconds when using this 
+        option.</td>
+    </tr>
+
+</table>
+
+<p>The options labeled as 'Extra' require a separate license for them to be unlocked.</p>
+
+</div>
+
+<hr/><!---------------------Authentication and License File---------------------->
+<h2><a name="auth">Authentication and License File</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<p>This tool has authentication built into the binary.  There are two authentication 
+mechanisms:  
+(a) the digital certificate embedded into the binary and (b) the runtime authentication.   
+For the first method, only the Windows and Mac OS-X (if available) versions have been 
+signed by an X-509 digital code signing certificate, which is validated by Windows 
+(or OS-X) during operation.  If the binary has been tampered with, the digital 
+certificate will be invalidated.</p>
+
+<p>For the second (runtime authentication) method, the authentication does two things: 
+(a) validates that the tool has a valid license and (b) validates the 
+tool's binary has not been corrupted.   The license needs to be in the same directory 
+of the tool for it to authenticate.   Furthermore any modification to the license, 
+either to its name or contents, will invalidate the license.   The runtime binary 
+validation hashes the executable that is running and fails the authentication if it 
+detects any modifications. </p>
+
+<h4><i>Limited</i> vice <i>Full</i> in the tool's output banner</h4>
+
+<p>The tools from TZWorks tools will output header information about the tool's version
+and whether it is running in <i>limited</i> or <i>full</i> mode.  This is directly related
+to what version of a license the tool authenticates with.   The <i>limited</i> keyword 
+indicates some functionality of the tool is not available, and the <i>full</i> keyword 
+indicates all the functionality is available.  The lacking functionality in the <i>limited</i>
+version may mean one or all of the following: (a) certain options may not be available, 
+(b) certain data may not be outputted in the parsed results, and (c) the license has a 
+finite lifetime before expiring.</p>
+</div>
+
+<hr/><!---------------------Version history---------------------->
+<h2><a name="version_history">Version history</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<ul type="square">
+	<li>04/05/2014 - v0.13 - fixed boundary condition in handling VMWare disks.
+                            fixed bug in handling dd images where volume offset not 0.</li>
+	<li>01/16/2014 - v0.12 - added -bodyfile and -csvl2t output options</li>
+	<li>11/23/2013 - v0.11 - updates to handle certain win8 entries</li>
+    <li>11/21/2013 - v0.10 - Initial release</li>
+</ul>
+</div>
+
+<hr/><!---------------------References---------------------->
+<h2><a name="references">References</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<ol>
+    <!-- 1. --><li>Leveraging the Application Compatibility Cache in Forensic Investigations, 
+					by Andrew Davis, Mandiant</li>
+				<li>http://msdn.microsoft.com/en-us/library/bb432182(v=vs.85).aspx</li>
+				<li>http://www.alex-ionescu.com/?p=41 </li>
+</ol>
+</div>
+
+<hr/><!---------------------Copyright---------------------->
+<h5 align="right">Copyright &copy; TZWorks, LLC, All Rights Reserved <br />
+Contact Info: <a href="mailto:info@tzworks.net">info&#64;tzworks.net</a></h5>
+
+<p></p>
+<hr />
+<p></p>
+</body>
+
+</html>
+

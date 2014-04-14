@@ -1,0 +1,403 @@
+<html>
+
+<head>
+    <title>evtx_view readme</title>
+    <style type="text/css">
+        div
+        {
+            margin-left: 1em;
+        }
+    </style>
+</head>
+
+<body bgcolor="white"">
+
+<h2 align="center"><a name="index">Windows Event Log Viewer - <i>evtx_view</i></a></h2>
+<h3 align="center">(version 0.76)<br /><br /></h3>
+<!--WARNING_TAG-->
+<hr />
+
+<ul>
+    <li> <a href="#eula"> End User's License Agreement (EULA) </a></li>
+
+    <li> <a href="#about"> About the <b><i>evtx_view</i></b> Tool </a></li>
+    <li> <a href="#howto">How to use this Tool</a></li>
+    <li> <a href="#templates">User Defined Templates</a></li>
+    <li> <a href="#faqs">FAQs</a></li>
+    <li> <a href="#auth"> Authentication and License File </a></li>
+    <li> <a href="#version_history"> Version history </a></li>
+    <li> <a href="#references"> References </a></li>
+</ul>
+
+
+
+<hr/><!---------------------EULA---------------------->
+<h2><a name="eula">TZWorks Tools included in the SANS Investigative Forensic Toolkit (SIFT)</br>
+END USER LICENSE AGREEMENT (EULA)</a></h2>
+
+<h3>USER AGREEMENT</h3>
+<div>
+<p>Permission to use the TZWorks, LLC software and related documentation (&quot;Software&quot;) 
+is for <b>Demonstration and Testing use ONLY</b>. The User Agreement, Disclaimer, and/or Software 
+may change from time to time.  By continuing to use the Software after those changes become 
+effective, you agree to be bound by all such changes.  Permission to use the Software is granted 
+provided that (1) use of such Software is for <b>Demonstration and Testing use only</b> and 
+(2) the Software is not resold, transferred or distributed to any other person or entity.  
+<i><font color="red">To use the Software for commercial or business purposes, a separate 
+license is required.</font></i> Contact TZWorks, LLC 
+(<a href="mailto:info@tzworks.net">info&#64;tzworks.net</a>) 
+for more information regarding licensing. To redistribute the Software, approval in writing 
+is required from TZWorks, LLC.  These terms do not give the user any rights in intellectual 
+property or technology, but only a limited right to use the Software for <b>Demostrations and 
+Testing</b>.  TZWorks, LLC retains all rights to ownership of this Software.</p>
+</div>
+
+<h3>DISCLAIMER</h3>    
+<div>
+<p>The user agrees that this Software is experimental in nature and use of the Software is 
+at user's sole risk.  The Software could include technical inaccuracies or errors.  Changes 
+are periodically added to the information herein, and TZWorks, LLC may make improvements and/or 
+changes to Software at any time.  TZWorks, LLC makes no representations about the accuracy or 
+usability of the Software for any purpose.</p>
+
+<p>ALL SOFTWARE ARE PROVIDED &quot;AS IS&quot; AND &quot;WHERE IS&quot; WITHOUT WARRANTY 
+OF ANY KIND INCLUDING ALL IMPLIED WARRANTIES AND CONDITIONS OF MERCHANTABILITY, FITNESS 
+FOR ANY PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT.  IN NO EVENT SHALL TZWORKS, LLC 
+BE LIABLE FOR ANY KIND OF DAMAGE RESULTING FROM ANY CAUSE OR REASON, ARISING OUT OF IT 
+IN CONNECTION WITH THE USE OR PERFORMANCE OF INFORMATION AVAILABLE FROM THIS SOFTWARE. </p>
+</div>
+
+<h3>REMOVAL</h3>
+<div>
+<p>The Software are the original works of TZWorks, LLC.  However, to be in compliance with 
+the Digital Millennium Copyright Act of 1998 (&quot;DMCA&quot;) we agree to investigate and disable any 
+material for infringement of copyright. Contact TZWorks, LLC at email address: 
+<a href="mailto:info@tzworks.net">info&#64;tzworks.net</a>, regarding any DMCA concerns. </p>
+</div>
+
+<!-- 
+This is section is commented out, since it is only used by the tool binary
+
+USER_AGREEMENT_START
+-------------------------------- User Agreement -----------------------------
+
+Permission to use the TZWorks, LLC software and related documentation
+("Software") is for Demonstration and Testing use ONLY. The User Agreement, 
+Disclaimer, and/or Software may change from time to time.  By continuing to 
+use the Software after those changes become effective, you agree to be 
+bound by all such changes.  Permission to use the Software is granted 
+provided that (1) use of such Software is for Demonstration and Testing use 
+only and (2) the Software is not resold, transferred or distributed to any 
+other person or entity.  To use the Software for commercial or business 
+purposes, a separate license is required. Contact TZWorks, LLC 
+(info@tzworks.net) for more information regarding licensing. To redistribute
+the Software, approval in writing is required from TZWorks, LLC.  These 
+terms do not give the user any rights in intellectual property or technology,
+but only a limited right to use the Software for Demostrations and Testing.
+TZWorks, LLC retains all rights to ownership of this Software.
+USER_AGREEMENT_END
+
+DISCLAIMER_START
+---------------------------------- DISCLAIMER -------------------------------
+
+The user agrees that all Software made available by TZWorks, LLC is
+experimental in nature and use of the Software is at user's sole risk. The
+Software could include technical inaccuracies or errors.  Changes are 
+periodically added to the information herein, and TZWorks, LLC may make 
+improvements and/or changes to Software and/or related documentation at any
+time.  TZWorks, LLC makes no representations about the accuracy or usability
+of the Software for any purpose.  All software are provided "AS IS" and 
+"WHERE IS" without warranty of any kind including all implied warranties and
+conditions of merchantability, fitness for any particular purpose, title and
+non-infringement.  In no event shall TZWorks, LLC be liable for any kind of 
+damage resulting from any cause or reason, arising out of it in connection
+with the use or performance of information available from this Software.
+DISCLAIMER_END
+-->
+
+
+
+
+<hr/><!---------------------About the <b><i>evtx_view</i></b> Tool---------------------->
+<h2><a name="about">About the <b><i>evtx_view</i></b> Tool
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<p><b><i>evtx_view</i></b> is a GUI version of an event log viewer that can parse 
+Windows event logs from all versions of Windows starting with Windows XP.  This 
+includes Vista, Windows 7 and 8 and their server counter parts.  Originally 
+inspired by the paper by Andreas Schuster on 'Introducing the Microsoft 
+Vista event log format', evtx_view was an attempt to take the concepts 
+introduced in the paper and implement a Windows API independent parsing engine. 
+Written entirely in C++, the <b><i>evtx_view</i></b> parse engine has been ported
+over to Windows, Linux and Mac OS-X.</p>
+
+<p>While Schuster's paper described the key elements of the new Microsoft event 
+log file format in  Vista and Windows 7,  his paper included notes on the 
+proprietary binary encoding of XML. Further research was necessary, however, to
+fully breakout the binary XML structures used in the Windows Vista and beyond.
+<b><i>evtx_view</i></b> is a culmination of this research.  Under the hood,
+<b><i>evtx_view</i></b> uses the same event log parsing engine as 
+<b><i><a href="http://tzworks.net/prototype_page.php?proto_id=25">evtwalk</a></i></b>.</p>
+
+<p><b><i>evtx_view</i></b> also makes use of the <a href="http://www.fox-toolkit.org/">FOX-toolkit </a>.
+FOX is a C++ based Toolkit for developing GUI applications that can
+easily run across various platforms by compiling the source for the 
+appropriate OS.  FOX is distributed under the GNU Lesser General Public 
+License (LGPL), with a FOX Library License addendum.</p>
+
+<p>To use this tool, an authentication file is required to be in the same 
+directory as the binary for the tool to run.  The non-commercial/demonstrational-use 
+EULA is part of this readme. It only activates certain capabilities of the 
+tool and is meant only for demonstration purposes.  This authentication will 
+eventually expire.  To activate all the functionality of the tool and use 
+it on a permanent basis, a separate business license needs to be purchased. 
+Contact <a href="mailto:info@tzworks.net">info&#64;tzworks.net</a> for more 
+details about the using this tool for business and/or casework use.</p>
+</div>
+
+<hr/><!---------------------How to use this Tool---------------------->
+<h2><a name="howto">How to use this Tool
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+
+<p>From the File-&gt;Open menu, select a WinXP, Vista or Windows 7 event log file 
+and the structure of the event log will be displayed.</p>
+
+<p>The WinXP eventlogs reside at:</p>
+<pre>
+    %windir%\system32\config\[AppEvent.Evt | SecEvent.Evt | SysEvent.Evt]
+</pre>
+
+<p>The Vista/Win7 eventlogs reside at:</p>
+<pre>
+    %windir%\system32\winevt\logs\[Application.evtx | Security.evtx | System.evtx | ...]
+</pre>
+
+<p>The display is broken up into a tree view directory structure on the
+left.  This contains all the records of the selected eventlog.  On the
+opposite pane on the right is for displaying output of selected 
+records as well as any results of reports/filters.</p>
+
+<p>Geared towards examining the eventlog internals, the tree view
+is broken into chunks (for evtx logs) and the encapsulation of each
+chunk as it is stored within the actual log. Expanding these folders 
+one can see the collection of strings, templates, and records.  For
+the evt logs (or WinXP), the internal structure of the logs is much
+simpler and hence is displayed just by record.</p>
+
+<p>Incorporated in version 0.62 and beyond is the ability to filter the
+log data by event id, date, and/or strings that are contained in the
+events.  This filtering is available in the 'Filters menu'. </p>  
+
+<p>While evtx_view is a GUI based tool, it can parse custom scripts to parse 
+any desired combination of eventlogs.  This is located in the 'Reports
+menu'. The syntax for the custom scripts are described under 'user
+defined templates'.</p>
+
+<p>As we have more time, custom 'canned' scripts will be hardcoded into
+evtx_view.  An example is the 'user logon/off' script.  If there are
+others that are desired, send an email to 
+<a href="mailto:info@tzworks.net">info&#64;tzworks.net</a>.</p>
+</div>
+
+<hr/><!---------------------User Defined Templates---------------------->
+<h2><a name="templates">User Defined Templates
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+
+<p>These are text files that allow one to automate eventlog extraction.  The
+parsing rules for these templates are as follows:</p>
+
+
+<p>General Rules.</p>
+<ol>
+    <li>each line is parsed separately</li>
+    <li>a line that starts w/ a double forward slash (eg //) is ignored and used for comments</li>
+    <li>a blank line is ignored</li>
+    <li>any line not satisfying Rule 2 & 3 above is assumed to be a command.</li>
+    <li>all command lines are in CSV (comma separated value) format</li>
+</ol>
+
+<p>Commands lines</p>
+<ol>
+    <li>must start with the sequence:   !cmd</li>
+    <li>and contain the following options, CSV delimited (in any order):
+    <pre>
+    -enum_evtxlog
+    -log, &lt;evtx path&gt;
+    -id, &lt;event id to extract&gt;
+    -name, &lt;event name to use for output&gt;
+    -conditions, &lt;parameter name|value name&gt;
+    -pull, &lt;parameter data to extract&gt;
+    </pre>
+    </li>
+</ol>
+           
+<h4>Template examples:</h4>
+
+<pre>
+    !cmd, -enum_evtxlog, -log, c:\windows\system32\winevt\logs\security.evtx, -id, 4624, -name, logon, -pull, TargetUserSid, -pull, SubjectUserSid, -pull, TargetUserName, -pull, LogonProcessName
+    !cmd, -enum_evtxlog, -log, c:\windows\system32\winevt\logs\system.evtx, -id, 1074, -name, reboot or shutdown, -conditions, Data|winlogon.exe
+
+    // for pre-vista (eg. xp) use the following:
+    //  for the -pull, use the key word strings to pull all the string data out
+    //
+    !cmd, -enum_evtlog, -log, c:\windows\system32\config\system.evt, -id, 1074, -name, reboot or shutdown, -pull, strings
+</pre>
+</div>
+
+<hr/><!---------------------FAQs---------------------->
+<h2><a name="faqs">FAQs
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<p>Network shares and issues w/ running under the admin account.    
+Some artifacts  when running under Vista or Windows 7 are the any network shares 
+established prior as a regular (non-admin) user, will be isolated from other 
+accounts (including the admin account).  This problem occurs because User Account 
+Control (UAC) treats members of the Administrators group as standard users. 
+Therefore, network shares that are mapped by logon scripts are shared with 
+the standard user access token instead of with the full administrator access 
+token. </p>
+
+<p>(according to Microsoft - http://support.microsoft.com/kb/937624)
+To work around this problem, configure the EnableLinkedConnections registry 
+value. This value enables Windows Vista to share network connections between 
+the filtered access token and the full administrator access token for a member 
+of the Administrators group. After you configure this registry value, LSA 
+checks whether there is another access token that is associated with the current 
+user session if a network resource is mapped to an access token. If LSA 
+determines that there is a linked access token, it adds the network share to 
+the linked location. </p>
+
+<p>To configure the EnableLinkedConnections registry value, follow these steps: </p>
+<ul>
+    <li>Click Start, type regedit in the Start Search box, and then press ENTER</li>
+    <li>Locate and then right-click the following registry subkey: <pre>
+            HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System</pre></li>
+
+    <li>Point to New, and then click DWORD Value.</li>
+    <li>Type EnableLinkedConnections, and then press ENTER.</li>
+    <li>Right-click EnableLinkedConnections, and then click Modify.</li>
+    <li>In the Value data box, type 1, and then click OK.</li>
+    <li>Exit Registry Editor, and then restart the computer.</li>
+</ul>
+             
+<p>Warning: Microsoft does not support this workaround.  They state that
+this workaround may make your system unsafe and should only be done at 
+your own risk</p>        
+</div>
+
+<hr/><!---------------------Authentication and License File---------------------->
+<h2><a name="auth">Authentication and License File</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<p>This tool has authentication built into the binary.  There are two authentication 
+mechanisms:  
+(a) the digital certificate embedded into the binary and (b) the runtime authentication.   
+For the first method, only the Windows and Mac OS-X (if available) versions have been 
+signed by an X-509 digital code signing certificate, which is validated by Windows 
+(or OS-X) during operation.  If the binary has been tampered with, the digital 
+certificate will be invalidated.</p>
+
+<p>For the second (runtime authentication) method, the authentication does two things: 
+(a) validates that the tool has a valid license and (b) validates the 
+tool's binary has not been corrupted.   The license needs to be in the same directory 
+of the tool for it to authenticate.   Furthermore any modification to the license, 
+either to its name or contents, will invalidate the license.   The runtime binary 
+validation hashes the executable that is running and fails the authentication if it 
+detects any modifications. </p>
+
+<h4><i>Limited</i> vice <i>Full</i> in the tool's output banner</h4>
+
+<p>The tools from TZWorks tools will output header information about the tool's version
+and whether it is running in <i>limited</i> or <i>full</i> mode.  This is directly related
+to what version of a license the tool authenticates with.   The <i>limited</i> keyword 
+indicates some functionality of the tool is not available, and the <i>full</i> keyword 
+indicates all the functionality is available.  The lacking functionality in the <i>limited</i>
+version may mean one or all of the following: (a) certain options may not be available, 
+(b) certain data may not be outputted in the parsed results, and (c) the license has a 
+finite lifetime before expiring.</p>
+
+</div>
+
+<hr/><!---------------------Version history---------------------->
+<h2><a name="version_history">Version history
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+
+<ul type="square">
+	<li>04/05/2014 - v0.76 - fixed issue in command file templates when trying to extract
+                            the 'Computer' field.</li>
+	<li>01/21/2014 - v0.75 - integrated readme into GUI help. </li>
+    <li>11/18/2013 - v0.74 - tweaked authentication options for demo license</li>
+	<li>10/09/2013 - v0.73 - fixed report for usb artifacts.</li>
+    <li>08/22/2013 - v0.72 - routine library maintenance updates</li>
+    <li>07/05/2013 - v0.71 - Added drag-n-drop to the Windows version and 
+                            updated the authentication routine</li>
+    <li>04/27/2013 - v0.70 - (a) updated eventlog search engine. (b) ensured records are 
+                            elfchnks are sorted in the treeview and (c) updated output for 
+                            reports.</li>
+    <li>03/15/2013 - v0.69 - updated fox library to latest stable version (1.6.47)</li>
+    <li>02/25/2013 - v0.68 - fixed bugs in GUI hotkeys for menu. fixed bug in truncated 
+                            integer output for some class of numbers</li>
+    <li>11/03/2012 - v0.67 - maintenance update of core libraries w/ bug fixes </li>
+    <li>10/13/2012 - v0.66 - fixed some boundary conditions. 
+    added report generation for event ID's for USB artifacts.
+    also added hash check to ensure binary integrity</li>
+    <li>04/05/2012 - v0.65 - added license authentication. </li>
+    <li>02/19/2012 - v0.64 - fixed date filter for xp event logs</li>
+    <li>10/22/2011 - v0.63 - added report for password and credential changes.</li>
+    <li>10/20/2011 - v0.62 - (a) added searching. [event id, date range, text string]. (b) fixed
+        bugs in event log 'SaveAs Interpreted data' option. (c) added context menu (rtclk)
+        on output pane to allow saving of formatted output to file. (d) starting to add reports
+        [logon, time change].... still needs more work in rendering the output headers for
+        pre-vista logs.</li>
+    <li>05/30/2011 - v0.61 - Updated to the Fox v1.6.43 library. Added 64 bit native build
+        to the mix.</li>
+    <li>02/26/2011 - v0.6a - maintenance updates</li>
+    <li>08/10/2010 - v0.6 - ported over to 64 bit OS-X 10.6</li>
+    <li>07/25/2010 - v0.5 - added parsing for pre-Vista [eg. XP] event logs.</li>
+    <li>05/05/2010 - v0.4 - fixed windows 64bit issue w/ accessing non WoW dirs. added rudimentary
+        text scripting for report generation. (very experimental and unstable).</li>
+    <li>03/29/2010 - v0.3b - misc fixes</li>
+    <li>03/26/2010 - v0.3a - misc fixes</li>
+    <li>03/21/2010 - v0.3 - added type to slot data and added robustness to enumerated corrupted
+        chunks. fixed problem with translation of unicode string while running in linux.</li>
+    <li>03/06/2010 - v0.2 added slot data to the view and incorporated bug fixes.</li>
+    <li>12/31/2009 - v0.1 - 1st prototype released for testing purposes</li>
+</ul>
+</div>
+
+<hr/><!---------------------References---------------------->
+<h2><a name="references">References
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<ol>
+    <li>Introducing the Microsoft Vista event log format, by Andreas Schuster, 2007 </li>
+    <li>Wikipedia, the free encyclopedia.  <a href="http://en.wikipedia.org/wiki/Event_Viewer">Event Viewer topic</a>.</li>
+    <li>TechNet, New Tools for <a href="http://technet.microsoft.com/en-us/magazine/2006.11.eventmanagement.aspx?pr=blog">Event Management in Windows Vista</a> </li>
+    <li><a href="http://www.fox-toolkit.org/">FOX-toolkit</a> version 1.6.43</li>
+    <li><a href="http://www.ultimatewindowssecurity.com/securitylog/encyclopedia/default.aspx">Randy Franklin Smith's online encyclopedia.</a></li>
+	<il>Windows Event Log Viewer, <a href="http://tzworks.net/prototype_page.php?proto_id=4"> evtx_view</a>  </il>
+	<li>Windows Event Log Parser, <a href="http://tzworks.net/prototype_page.php?proto_id=25">evtwalk</a> </li>
+</ol>
+</div>
+
+<hr/><!---------------------Copyright---------------------->
+<h5 align="right">Copyright &copy; TZWorks, LLC, All Rights Reserved <br />
+Contact Info: <a href="mailto:info@tzworks.net">info&#64;tzworks.net</a></h5>
+
+<p></p>
+<hr />
+<p></p>
+</body>
+
+</html>
+
