@@ -17,7 +17,8 @@ cp -R tzworks/docs/* /usr/local/share/tzworks
 # Misc Scripts
 cp scripts/* /usr/local/bin
 
+# Removing old tzworks id app
+# Now called id64, installed by line #14
 if [ -e /usr/local/bin/id ]; then
-  echo "Removing old id file"
   rm -f /usr/local/bin/id
 fi
