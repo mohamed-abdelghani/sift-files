@@ -25,13 +25,13 @@ import calendar
 import csv
 from Registry import Registry
 
-from BinaryParser import Block
-from BinaryParser import debug
-from BinaryParser import debug_increase_indent
-from BinaryParser import debug_decrease_indent
-from BinaryParser import debug_enable
-from BinaryParser import debug_disable
-from BinaryParser import OverrunBufferException
+from BinaryParserShell import Block
+from BinaryParserShell import debug
+from BinaryParserShell import debug_increase_indent
+from BinaryParserShell import debug_decrease_indent
+from BinaryParserShell import debug_enable
+from BinaryParserShell import debug_disable
+from BinaryParserShell import OverrunBufferException
 from ShellItems import SHITEMLIST
 from ShellItems import ITEMPOS_FILEENTRY
 
