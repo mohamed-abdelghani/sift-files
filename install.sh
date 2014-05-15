@@ -18,7 +18,7 @@ cp -R tzworks/docs/* /usr/local/share/tzworks
 cp scripts/* /usr/local/bin
 
 # Volatility Plugins
-cp volatility/*.py /usr/share/pyshared/volatility/plugins
+cp volatility/*.py /usr/lib/python2.7/dist-packages/volatility/plugins
 
 # Removing old tzworks id app
 # Now called id64, installed by line #14
