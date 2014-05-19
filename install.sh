@@ -14,6 +14,9 @@ mkdir -p /usr/local/share/tzworks
 cp tzworks/bin/* /usr/local/bin
 cp -R tzworks/docs/* /usr/local/share/tzworks
 
+# WB Tools
+cp wbtools/* /usr/local/bin
+
 # Misc Scripts
 cp scripts/* /usr/local/bin
 
