@@ -28,3 +28,5 @@ cp volatility/*.py /usr/lib/python2.7/dist-packages/volatility/plugins
 if [ -e /usr/local/bin/id ]; then
   rm -f /usr/local/bin/id
 fi
+
+chmod 755 /usr/local/bin/*

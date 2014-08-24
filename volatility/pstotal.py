@@ -1,6 +1,6 @@
 # pstotal
-# Copyright (C) 2012 The SANS(tm) Institute
-# 
+# Copyright (C) 2014 Sue Stirrup
+#
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or (at
@@ -16,87 +16,161 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 '''
-Rewrite of Jesse Kornblum's pstotal plugin for Volatility 2.0
+Rewrite of and enhancements to the SANS(tm) Institute's text based pstotal plugin
+based on Jesse Kornblum's original for Volatility 2.0.
 
-@author:        The SANS(tm) Institute
+@author:        Sue Stirrup
 @license:       GNU General Public License 2.0 or later
 @contact:       info@sans.org
 @organization:  The SANS(tm) Institute
-
-Amended by Sue Stirrup
+Amendments + enhancements
    *  Default behaviour to display complete list of processes (process scan)
-   *  Commandline option to display only processes hidden from process list (original behaviour)
-   *  Hidden processes shown as TRUE in text output
-   *  Dot rendering added
-   *  Hidden processes rendered in red
-
-Updated 2014.05.12 by Matt Anderson <matt.anderson@skewd.net>
-   *  Update for volatility 2.3.1
+		- Interesting column added to show processes hidden from pslist.
+   *  Command line option to display only processes hidden from process list (original behaviour)
+   *  Graphical visualisation option using Graphviz and .dot format via the command line added:
+		- Command line option to display process command (graphical representation only)
+		- Command line option to display process path name (graphical representation only)
+		- Processes from prior boot rendered in light blue (with exit time before current boot or not available
+		- Processes from prior boot rendered in medium blue (with exit time after current boot
+		- Processes from current boot but hidden from pslist rendered in red
 '''
 
 import filescan
-#import volatility.commands as commands
-import volatility.commands as commands
+import volatility.plugins.common as common
 import volatility.utils as utils
 import volatility.obj as obj
 import volatility.win32.tasks as tasks
 import pdb
+import re
 
-class pstotal(commands.Command):
-    ''' List processes in process scan but not process list if the --short option is set '''
-    
-    def __init__(self, config, *args):
-        commands.Command.__init__(self, config, *args)
-        self._config.add_option('SHORT', help = 'Interesting processes only', action = 'store_true')
-    
+class pstotal(common.AbstractWindowsCommand):
+    ''' Combination of pslist, psscan & pstree --output=dot gives graphical representation '''
+
+    def __init__(self, config, *args, **kwargs):
+        common.AbstractWindowsCommand.__init__(self, config, *args, **kwargs)
+        config.add_option('SHORT', short_option='S', default=False, help='Interesting processes only', action='store_true')
+        config.add_option('CMD', short_option='C', default=False, help='(--output=dot only) Display process command line. All {} removed', action='store_true')
+        config.add_option('PATH', short_option='P', default=False, help='(--output=dot only) Display process image path', action='store_true')
+
     def render_text(self, outfd, data):
         processes = data[0]
-	hidden = data[1]
-        outfd.write(" Offset     Name             PID    PPID   PDB        Time created                 Time exited                  Hidden \n" + \
-                    "---------- ---------------- ------ ------ ---------- ---------------------------- ---------------------------- ------- \n")
+        interest = data[1]
+        outfd.write("Offset (V) Name                PID   PPID PDB        Time created                 Time exited                  Interesting\n" + \
+                    "---------- ---------------- ------ ------ ---------- ---------------------------- ---------------------------- -----------\n")
 
         for eprocess in processes:
-		if hidden[processes[eprocess].obj_offset] == 1:
-			hide = 'TRUE'
-		else:
-			hide = ' '
-		outfd.write("0x{0:08x} {1:16} {2:6} {3:6} 0x{4:08x} {5:28} {6:28} {7:6}\n".format(
-			processes[eprocess].obj_offset,
-			processes[eprocess].ImageFileName,
-			processes[eprocess].UniqueProcessId,
-			processes[eprocess].InheritedFromUniqueProcessId,
-			processes[eprocess].Pcb.DirectoryTableBase,
-			processes[eprocess].CreateTime or '',
-			processes[eprocess].ExitTime or '',
-			hide))
-				
+            if interest[processes[eprocess].obj_offset] == 1:
+                interesting = 'TRUE'
+            else:
+                interesting = ''
+            outfd.write("0x{0:08x} {1:16} {2:6} {3:6} 0x{4:08x} {5:28} {6:28} {7:7}\n".format(
+                    processes[eprocess].obj_offset,
+                    processes[eprocess].ImageFileName,
+                    processes[eprocess].UniqueProcessId,
+                    processes[eprocess].InheritedFromUniqueProcessId,
+                    processes[eprocess].Pcb.DirectoryTableBase,
+                    processes[eprocess].CreateTime or '',
+                    processes[eprocess].ExitTime or '', interesting))
+
     def render_dot(self, outfd, data):
         objects = set()
         links = set()
+        proc_seen = set()
         processes = data[0]
         filling = data[1]
-        
+        cmdline = data[2]
+        pathname = data[3]
+        smssTime = ' '
+
+		# Obtain boot time
+        for proc in processes:
+            proc_name = processes[proc].ImageFileName
+            ppid = processes[proc].InheritedFromUniqueProcessId
+            if proc_name.find("System") == 0 and processes[proc].CreateTime:
+                smssTime = processes[proc].CreateTime
+            elif proc_name.find("smss.exe") == 0 and ppid == 4:
+                smssTime = processes[proc].CreateTime
+
         for eprocess in processes:
             proc_offset = processes[eprocess].obj_offset
-            label = "{0} | {1} | created\\n{2} |".format(processes[eprocess].UniqueProcessId,
-                                         processes[eprocess].ImageFileName,
-                                         processes[eprocess].CreateTime or 'not available')
+            label = "{0} | offset (V)\\n0x{1:08x} | {2} | ".format(processes[eprocess].UniqueProcessId,
+					                     proc_offset,
+                                         processes[eprocess].ImageFileName)
+			# Display process command line option
+            if self._config.CMD :
+                try:
+                    if not processes[eprocess].CreateTime < smssTime:
+                        s = "%s" % (cmdline[proc_offset])
+                        s = s.replace('"', '')
+                        s = s.replace('\\', '\\\\')
+                        pos = s.find("csrss.exe")
+                        if pos > 0:
+                            pos = pos + 9
+                            s = s[:pos] + "\\n (Run pstree to get command parameters)"
+                        pos = s.find("conhost.exe")
+                        if pos > 0:
+                            pos = pos + 11
+                            s = s[:pos] + "\\n (Run pstree to get command parameters)"
+                        label += "command:\\n{0} | ".format(s or 'not available')
+                        label = label.replace('{', '')
+                        label = label.replace('}', '')
+                except KeyError:
+                    pass
+			# Display process path option
+            if self._config.PATH :
+                try:
+                    if not processes[eprocess].CreateTime < smssTime:
+                        s = "%s" % (cmdline[proc_offset])
+                        s = s.replace('"', '')
+                        s = s.replace('\\', '\\\\')
+                        pos = s.find("csrss.exe")
+                        if pos > 0:
+                            pos = pos + 9
+                            s = s[:pos] + "\\n (Run pstree to get command parameters)"
+                        pos = s.find("conhost.exe")
+                        if pos > 0:
+                            pos = pos + 11
+                            s = s[:pos] + "\\n (Run pstree to get command parameters)"
+                        label += "path:\\n{0} | ".format(s or 'not available')
+                except KeyError:
+                    pass
+            label += "created:\\n{0} |".format(processes[eprocess].CreateTime or 'not available')
+			# Identify processes that have exited
             if processes[eprocess].ExitTime:
-                label += "exited\\n{0}".format(processes[eprocess].ExitTime)
+                label += "exited:\\n{0}".format(processes[eprocess].ExitTime)
                 options = ' style = "filled" fillcolor = "lightgray" '
             else:
                 label += "running"
                 options = ''
+			# Identify processes that are 'hidden' and relate to the current boot
             if filling[proc_offset] == 1:
                 options = ' style = "filled" fillcolor = "red" '
-                           
+			# Identify processes that are 'hidden' and relate to the previous boot
+            if processes[eprocess].CreateTime < smssTime and processes[eprocess].UniqueProcessId != 4:
+                options = ' style = "filled" fillcolor = "lightblue" '
+                if not processes[eprocess].ExitTime:
+                    label = label[:-7]
+                    label += "not available\\nprior boot"
+				# Exit time is after current boot time
+                elif processes[eprocess].ExitTime > smssTime:
+                    options = ' style = "filled" fillcolor = "darkblue" '
             label = "{" + label + "}"
-            objects.add('pid{0} [label="{1}" shape="record" {2}];\n'.format(processes[eprocess].UniqueProcessId,
+			# Sometimes windows creates duplicate process blocks - one in the doubly linked list and one scraped. We need to see both
+            pid = "%s" % (processes[eprocess].UniqueProcessId)
+
+            if pid in proc_seen:
+                objects.add('pid{0}a [label="{1}" shape="record" {2}];\n'.format(processes[eprocess].UniqueProcessId,
                                                                             label, options))
-            links.add("pid{0} -> pid{1} [];\n".format(processes[eprocess].InheritedFromUniqueProcessId,
+                links.add("pid{0} -> pid{1}a [];\n".format(processes[eprocess].InheritedFromUniqueProcessId,
+                                                      processes[eprocess].UniqueProcessId))
+            else:
+                proc_seen.add(pid)
+                objects.add('pid{0} [label="{1}" shape="record" {2}];\n'.format(processes[eprocess].UniqueProcessId,
+                                                                            label, options))
+                links.add("pid{0} -> pid{1} [];\n".format(processes[eprocess].InheritedFromUniqueProcessId,
                                                       processes[eprocess].UniqueProcessId))
 
-        ## Now write the dot file
+        # # Now write the dot file
         outfd.write("digraph processtree { \ngraph [rankdir = \"TB\"];\n")
         for link in links:
             outfd.write(link)
@@ -104,18 +178,20 @@ class pstotal(commands.Command):
         for item in objects:
             outfd.write(item)
         outfd.write("}")
-    
+
     def calculate(self):
         eproc = {}
         found = {}
-              
+        cmdline = {}
+        pathname = {}
+
         # Brute force search for eproc blocks in pool memory
-        address_space = utils.load_as(self._config, astype = 'physical')
+        address_space = utils.load_as(self._config, astype='physical')
         for offset in filescan.PoolScanProcess().scan(address_space):
-            eprocess = obj.Object('_EPROCESS', vm = address_space, offset = offset)
+            eprocess = obj.Object('_EPROCESS', vm=address_space, offset=offset)
             eproc[offset] = eprocess
             found[offset] = 1
-        
+
         # Walking the active process list.
         # Remove any tasks we find here from the brute force search if the --short option is set.
         # Anything left is something which was hidden/terminated/of interest.
@@ -128,7 +204,13 @@ class pstotal(commands.Command):
                     del found[phys]
                 else:
                     found[phys] = 0
-        
-        ret = [eproc, found]
+
+        # Grab command line and parameters
+            peb = task.Peb
+            if peb:
+                cmdline[phys] = peb.ProcessParameters.CommandLine
+                pathname[phys] = peb.ProcessParameters.ImagePathName
+
+        ret = [eproc, found, cmdline, pathname]
 
         return ret
