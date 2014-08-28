@@ -32,6 +32,9 @@ cp pe_carver/*.py /usr/local/bin
 # Install Page Brute
 cp page_brute/*.py /usr/local/bin
 
+# Install Java PDX Parser
+cp java_idx_parser/*.py /usr/local/bin
+
 # Removing old tzworks id app
 # Now called id64, installed by line #14
 if [ -e /usr/local/bin/id ]; then
