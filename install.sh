@@ -26,6 +26,9 @@ cp volatility/*.py /usr/lib/python2.7/dist-packages/volatility/plugins
 # Install Density Scout
 cp densityscout/densityscout /usr/local/bin
 
+# Intall PE Carver
+cp pe_carver/*.py /usr/local/bin
+
 # Removing old tzworks id app
 # Now called id64, installed by line #14
 if [ -e /usr/local/bin/id ]; then

@@ -1,3 +1,3 @@
 [submodule "PE_Carver"]
-	path = PE_Carver
+	path = pe_carver
 	url = https://github.com/Rurik/PE_Carver.git
