@@ -1,3 +1,6 @@
 [submodule "PE_Carver"]
 	path = pe_carver
 	url = https://github.com/Rurik/PE_Carver.git
+[submodule "page_brute"]
+	path = page_brute
+	url = https://github.com/matonis/page_brute.git
