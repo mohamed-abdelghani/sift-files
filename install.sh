@@ -42,3 +42,9 @@ if [ -e /usr/local/bin/id ]; then
 fi
 
 chmod 755 /usr/local/bin/*
+
+## Install Patches
+
+# Install rc.local patch for more loopback devices
+# fixes https://github.com/sans-dfir/sift/issues/22
+patch -sN /etc/rc.local < patches/rc.local.patch
