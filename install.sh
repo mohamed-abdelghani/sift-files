@@ -38,7 +38,6 @@ cp java_idx_parser/*.py /usr/local/bin
 # Install SIFT Files
 mkdir -p /usr/share/sift/resources
 cp sift/resources/* /usr/share/sift/resources
-cp sift/resources/* /home/$SUDO_USER/Desktop
 mkdir -p /usr/share/sift/images
 cp sift/images/* /usr/share/sift/images
 mkdir -p /usr/share/sift/audio
