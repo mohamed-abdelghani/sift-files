@@ -45,7 +45,7 @@ cp sift/audio/* /usr/share/sift/audio
 mkdir -p /usr/share/sift/other
 cp sift/other/* /usr/share/sift/other
 mkdir -p /usr/share/sift/scripts
-cp sift/scripts/* /usr/share/sift/scripts
+cp sift/scripts/* /usr/local/bin
 
 # Removing old tzworks id app
 # Now called id64, installed by line #14
