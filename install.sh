@@ -55,6 +55,9 @@ fi
 
 chmod 755 /usr/local/bin/*
 
+## Fix Privacy Controls
+bash fixubuntu.sh
+
 ## Install Patches
 
 # Install rc.local patch for more loopback devices
