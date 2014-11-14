@@ -1,3 +1,4 @@
+#!/usr/bin/python
 #sqlparse.py
 #
 #This program parses an SQLite3 database for deleted entires and

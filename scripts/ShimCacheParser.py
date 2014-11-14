@@ -1,5 +1,4 @@
-#! /usr/bin/python
-
+#!/usr/bin/python
 # ShimCacheParser.py
 #
 # Andrew Davis, andrew.davis@mandiant.com

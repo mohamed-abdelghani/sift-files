@@ -1,3 +1,4 @@
+#!/usr/bin/python
 #
 #GA-Parser v1.1
 #This program carves and parses Google Analytic vales (utma utmb, utmz from a file (unallocated, memory dump, pagefile etc.)
