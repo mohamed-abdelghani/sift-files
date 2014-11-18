@@ -47,6 +47,10 @@ cp sift/other/* /usr/share/sift/other
 mkdir -p /usr/share/sift/scripts
 cp sift/scripts/* /usr/local/bin
 
+# Updated Regripper Stuff
+mkdir -p /usr/share/regripper
+cp -R regripper/* /usr/share/regripper
+
 # Removing old tzworks id app
 # Now called id64, installed by line #14
 if [ -e /usr/local/bin/id ]; then
