@@ -17,6 +17,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
 #
+# Details on TrustRecords at http://forensicartifacts.com/2012/07/ntuser-trust-records/
 
 """
 @author:       Dave Lassalle
@@ -33,12 +34,14 @@ import volatility.win32.rawreg as rawreg
 import volatility.debug as debug
 import volatility.utils as utils
 import volatility.plugins.registry.hivelist as hivelist
+import struct
+import datetime
 
 def vol(k):
     return bool(k.obj_offset & 0x80000000)
 
-class UninstallInfo(hivelist.HiveList):
-    """Extract installed software info from Uninstall registry key"""
+class TrustRecords(hivelist.HiveList):
+    """Extract MS Office TrustRecords from the Registry"""
 
     meta_info = {}
     meta_info['author']    = 'Dave Lassalle'
@@ -46,13 +49,12 @@ class UninstallInfo(hivelist.HiveList):
     meta_info['contact']   = 'dave@superponible.com'
     meta_info['license']   = 'GNU General Public License 2.0 or later'
     meta_info['url']       = 'http://superponible.com/'
-    meta_info['os']        = 'WIN_32_XP_SP3'
     meta_info['version']   = '1.0'
 
     def __init__(self, config, *args, **kwargs):
         hivelist.HiveList.__init__(self, config, *args, **kwargs)
         config.add_option('HIVE-OFFSET', short_option = 'o',
-                          help = 'SOFTWARE Hive offset (virtual)', type = 'int')
+                          help = 'USER Hive offset (virtual)', type = 'int')
 
     def hive_name(self, hive):
         try:
@@ -64,72 +66,65 @@ class UninstallInfo(hivelist.HiveList):
         addr_space = utils.load_as(self._config)
         regapi = registryapi.RegistryApi(self._config)
 
-        software_hive = "SOFTWARE"
-        uninstall = "Microsoft\\Windows\\CurrentVersion\\Uninstall"
+        user_hive = "ntuser.dat"
+        trustrecords = {"Software\\Microsoft\\Office\\14.0\\Word\\Security\\Trusted Documents\\TrustRecords",
+                        "Software\\Microsoft\\Office\\14.0\\Excel\\Security\\Trusted Documents\\TrustRecords",
+                        "Software\\Microsoft\\Office\\14.0\\PowerPoint\\Security\\Trusted Documents\\TrustRecords",
+                        "Software\\Microsoft\\Office\\14.0\\Access\\Security\\Trusted Documents\\TrustRecords",
+                       }
 
-        hive_offsets = []
+        hive_offsets = {}
         if not self._config.HIVE_OFFSET:
             for h in hivelist.HiveList.calculate(self):
                 hive_name = self.hive_name(h)
-                if software_hive in hive_name:
-                    hive_offsets = [(hive_name, h.obj_offset)]
+                if user_hive in hive_name.lower():
+                    hive_offsets[h.obj_offset] = hive_name
         else:
             hive_offsets = [("User Specified", self._config.HIVE_OFFSET)]
 
-        for name, hoff in set(hive_offsets):
+        found = False
+        for hoff, name in hive_offsets.iteritems():
             h = hivemod.HiveAddressSpace(addr_space, self._config, hoff)
             root = rawreg.get_root(h)
             if not root:
                 if self._config.HIVE_OFFSET:
                     debug.error("Unable to find root key. Is the hive offset correct?")
             else:
-                uninstall_key = rawreg.open_key(root, uninstall.split('\\'))
-                if uninstall_key:
-                    yield name, uninstall_key
-                else:
-                    outfd.write("The requested key could not be found in the hive(s) searched\n")
+                for r in trustrecords:
+                    trustrecord_key = rawreg.open_key(root, r.split('\\'))
+                    if trustrecord_key:
+                        yield name, r, trustrecord_key
+                        found = True
+
+        if not found:
+            debug.error("The requested key could not be found in the hive(s) searched\n")
 
 
     def voltext(self, key):
         return "(V)" if vol(key) else "(S)"
 
     def render_text(self, outfd, data):
-        print_values = {5:'InstallSource', 6:'InstallLocation', 3:'Publisher',
-                        1:'DisplayName', 2:'DisplayVersion', 4:'InstallDate'}
         outfd.write("Legend: (S) = Stable   (V) = Volatile\n\n")
         keyfound = False
-        for reg, key in data:
+        for reg, path, key in data:
             if key:
                 keyfound = True
                 outfd.write("----------------------------\n")
                 outfd.write("Registry: {0}\n".format(reg))
+                outfd.write("Key path: {0}\n".format(path))
                 outfd.write("Key name: {0} {1:3s}\n".format(key.Name, self.voltext(key)))
                 outfd.write("Last updated: {0}\n".format(key.LastWriteTime))
                 outfd.write("\n")
-                outfd.write("Subkeys:\n")
-                for s in rawreg.subkeys(key):
-                    key_info = {}
-                    if s.Name == None:
-                        outfd.write("  Unknown subkey: " + s.Name.reason + "\n")
-                    else:
-                        key_info['Name'] = s.Name
-                        key_info['LastUpdated'] = s.LastWriteTime
-                        for v in rawreg.values(s):
-                            if v.Name not in print_values.values():
-                                continue
-                            tp, dat = rawreg.value_data(v)
-                            if tp == 'REG_BINARY' or tp == 'REG_NONE':
-                                dat = "\n" + "\n".join(["{0:#010x}  {1:<48}  {2}".format(o, h, ''.join(c)) for o, h, c in utils.Hexdump(dat)])
-                            if tp in ['REG_SZ', 'REG_EXPAND_SZ', 'REG_LINK']:
-                                dat = dat.encode("ascii", 'backslashreplace')
-                            if tp == 'REG_MULTI_SZ':
-                                for i in range(len(dat)):
-                                    dat[i] = dat[i].encode("ascii", 'backslashreplace')
-                            key_info[str(v.Name)] = dat
-                    outfd.write("Subkey: {0}\n".format(key_info.get('Name','')))
-                    outfd.write("  LastUpdated     : {0}\n".format(key_info.get('LastUpdated','')))
-                    for k, v in sorted(print_values.items()):
-                        val = key_info.get(v, '')
-                        if val != '':
-                            outfd.write("  {0:16}: {1}\n".format(v, val))
-                    outfd.write("\n")
+                outfd.write("Values:\n")
+                for s in rawreg.values(key):
+                    tp, dat = rawreg.value_data(s)
+                    if tp == 'REG_BINARY' or tp == 'REG_NONE':
+                        time = struct.unpack("<q", dat[0:8])[0]
+                        seconds, msec= divmod(time, 10000000)
+                        days, seconds = divmod(seconds, 86400)
+                        if days > 160000 or days < 140000:
+                            days = 0
+                            seconds = 0
+                            msec = 0
+                        open_date = datetime.datetime(1601, 1, 1) + datetime.timedelta(days, seconds, msec)
+                        outfd.write(str(open_date) + "\t" + s.Name + "\n")
