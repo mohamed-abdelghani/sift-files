@@ -22,6 +22,7 @@ cp scripts/* /usr/local/bin
 
 # Volatility Plugins
 cp volatility/*.py /usr/lib/python2.7/dist-packages/volatility/plugins
+rm -f /usr/lib/python2.7/dist-packages/volatility/plugins/javarat.py
 
 # Install Density Scout
 cp densityscout/densityscout /usr/local/bin
