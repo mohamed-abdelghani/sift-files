@@ -23,6 +23,7 @@ cp scripts/* /usr/local/bin
 # Volatility Plugins
 cp volatility/*.py /usr/lib/python2.7/dist-packages/volatility/plugins
 rm -f /usr/lib/python2.7/dist-packages/volatility/plugins/javarat.py
+chmod -R 644 /usr/lib/python2.7/dist-packages/volatility/plugins/*.py
 
 # Install Density Scout
 cp densityscout/densityscout /usr/local/bin
@@ -51,6 +52,7 @@ cp sift/scripts/* /usr/local/bin
 # Updated Regripper Stuff
 mkdir -p /usr/share/regripper
 cp -R regripper/* /usr/share/regripper
+chmod -R 644 /usr/share/regripper/*
 
 # Removing old tzworks id app
 # Now called id64, installed by line #14
