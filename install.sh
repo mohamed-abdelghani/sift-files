@@ -12,6 +12,9 @@ cp samba/* /etc/samba
 # WB Tools
 cp wbtools/* /usr/local/bin
 
+# PDF Tools
+cp pdf-tools/* /usr/local/bin
+
 # Misc Scripts
 cp scripts/* /usr/local/bin
 
