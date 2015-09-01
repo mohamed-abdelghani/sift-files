@@ -58,19 +58,20 @@ class pstotal(common.AbstractWindowsCommand):
         interest = data[1]
         outfd.write("Offset (P)     Name          PID    PPID   PDB        Time created             Time exited             Interesting \n" + \
                     "---------- ---------------- ------ ------ ---------- ------------------------ ------------------------ ----------- \n")
-
-        if interest[processes[eprocess].obj_offset] == 1:
-            interesting = 'TRUE'
-        else:
-            interesting = ' '
-        outfd.write("0x{0:08x} {1:16} {2:6} {3:6} 0x{4:08x} {5:24} {6:24} {7:7}\n".format(
-                processes[eprocess].obj_offset,
-                processes[eprocess].ImageFileName,
-                processes[eprocess].UniqueProcessId,
-                processes[eprocess].InheritedFromUniqueProcessId,
-                processes[eprocess].Pcb.DirectoryTableBase,
-                processes[eprocess].CreateTime or '',
-                processes[eprocess].ExitTime or '', interesting))
+	for eprocess in processes:
+		proc_offset = processes[eprocess].obj_offset
+        	if interest[processes[eprocess].obj_offset] == 1:
+            		interesting = 'TRUE'
+        	else:
+            		interesting = ' '
+        	outfd.write("0x{0:08x} {1:16} {2:6} {3:6} 0x{4:08x} {5:24} {6:24} {7:7}\n".format(
+                	processes[eprocess].obj_offset,
+                	processes[eprocess].ImageFileName,
+                	processes[eprocess].UniqueProcessId,
+                	processes[eprocess].InheritedFromUniqueProcessId,
+                	processes[eprocess].Pcb.DirectoryTableBase,
+                	processes[eprocess].CreateTime or '',
+                	processes[eprocess].ExitTime or '', interesting))
             
     def render_dot(self, outfd, data):
         objects = set()
